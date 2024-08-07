@@ -1,0 +1,33 @@
+﻿using System;
+using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Minesweeper.Extensions;
+
+public static class SpriteBatchExt
+{
+    public static void DrawRectangle(this SpriteBatch spriteBatch, Rectangle rectangle, Color color)
+    {
+        if (spriteBatch is null)
+            throw new ArgumentNullException(nameof(spriteBatch));
+
+        Texture2D texture = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+        texture.SetData(new []{color});
+        
+        spriteBatch.Draw(texture, rectangle, color);
+    }
+    
+    public static void CreateBorder(this SpriteBatch spriteBatch, Rectangle rectangle, Color color, int lineWidth) {
+        if (spriteBatch is null)
+            throw new ArgumentNullException(nameof(spriteBatch));
+        
+        Texture2D texture = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
+        texture.SetData(new []{Color.White});
+
+        spriteBatch.Draw(texture, new Rectangle(rectangle.X, rectangle.Y, lineWidth, rectangle.Height + lineWidth), color);
+        spriteBatch.Draw(texture, new Rectangle(rectangle.X, rectangle.Y, rectangle.Width + lineWidth, lineWidth), color);
+        spriteBatch.Draw(texture, new Rectangle(rectangle.X + rectangle.Width, rectangle.Y, lineWidth, rectangle.Height + lineWidth), color);
+        spriteBatch.Draw(texture, new Rectangle(rectangle.X, rectangle.Y + rectangle.Height, rectangle.Width + lineWidth, lineWidth), color);
+    }
+}
