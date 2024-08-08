@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Minesweeper.Graphics;
 
 namespace Minesweeper.Entities;
@@ -13,6 +14,8 @@ public class MineTile : Clickable
     public const int TILE_HEIGHT = 18;
 
     private Sprite hiddenTileSprite;
+    private Sprite flaggedTileSprite;
+    private Sprite wrongfulFlaggedTileSprite;
     
     private Sprite emptyTileSprite;
     
@@ -23,10 +26,13 @@ public class MineTile : Clickable
     
     public int Index { get; private set; }
     public bool Hidden { get; set; }
+    public bool Flagged { get; set; }
+    public bool ShouldDisplayWrongfulFlagged { get; set; }
 
     private Texture2D spriteSheet;
     
-    public event EventHandler RevealEvent;
+    public event EventHandler ClickEvent;
+    public event EventHandler FlagEvent;
 
     public int xIndex;
     public int yIndex;
@@ -43,8 +49,11 @@ public class MineTile : Clickable
         
         Index = 0;
         Hidden = true;
+        Flagged = false;
 
         hiddenTileSprite = new Sprite(spriteSheet, 0, 47, TILE_WIDTH, TILE_HEIGHT);
+        flaggedTileSprite = new Sprite(spriteSheet, 36, 47, TILE_WIDTH, TILE_HEIGHT);
+        wrongfulFlaggedTileSprite = new Sprite(spriteSheet, 126, 47, TILE_WIDTH, TILE_HEIGHT);
         emptyTileSprite = new Sprite(spriteSheet, TILE_WIDTH, 47, TILE_WIDTH, TILE_HEIGHT);
         bombTileSprite = new Sprite(spriteSheet, 90, 47, TILE_WIDTH, TILE_HEIGHT);
         clickedBombTileSprite = new Sprite(spriteSheet, 90 + TILE_WIDTH, 47, TILE_WIDTH, TILE_HEIGHT);
@@ -60,6 +69,20 @@ public class MineTile : Clickable
 
     private Sprite getSpriteByIndex(int index)
     {
+        if (Hidden)
+        {
+            if (Flagged)
+            {
+                if (!isBomb() && ShouldDisplayWrongfulFlagged)
+                {
+                    return wrongfulFlaggedTileSprite;
+                }
+                return flaggedTileSprite;
+            }
+
+            return hiddenTileSprite;
+        }
+        
         switch (index)
         {
             case <= -2:
@@ -86,16 +109,30 @@ public class MineTile : Clickable
 
     protected override void OnLeftMouseClick()
     {
-        Reveal();
+        Reveal(Mouse.GetState().LeftButton);
+    }
+    
+    protected override void OnRightMouseClick()
+    {
+        Flag();
+    }
+    
+    public void Flag()
+    {
+        Flagged = !Flagged;
+        OnFlagEvent();
     }
 
-    public void Reveal()
+    public void Reveal(ButtonState buttonState)
     {
-        if (Hidden)
+        if (!Flagged)
         {
-            OnRevealEvent();
-            Hidden = false;
-            setSpriteByIndex(Index);
+            if (Hidden)
+            {
+                OnClickEvent(buttonState);
+                Hidden = false;
+                setSpriteByIndex(Index);
+            }
         }
     }
 
@@ -104,21 +141,31 @@ public class MineTile : Clickable
         Sprite = sprite;
     }
     
-    protected virtual void OnRevealEvent()
+    protected virtual void OnClickEvent(ButtonState buttonState)
     {
-        EventHandler handler = RevealEvent;
+        EventHandler handler = ClickEvent;
+        handler?.Invoke(this, new OnClickEventArgs(buttonState));
+    }
+    
+    protected virtual void OnFlagEvent()
+    {
+        EventHandler handler = FlagEvent;
         handler?.Invoke(this, EventArgs.Empty);
     }
 
     public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
     {
-        if (Hidden)
-        {
-            hiddenTileSprite.Draw(spriteBatch, Position);
-        }
-        else
-        {
-            getSpriteByIndex(Index).Draw(spriteBatch, Position);
-        }
+        getSpriteByIndex(Index).Draw(spriteBatch, Position);
     }
+    
+    public bool isBomb()
+    {
+        return Index == -1;
+    }
+    
+    public bool isEmpty()           
+    {
+        return Index == 0;
+    }
+
 }

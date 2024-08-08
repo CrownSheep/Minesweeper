@@ -22,8 +22,11 @@ public class GameGrid
     private int placedBombs = 0;
 
     private Random random;
-
+    
     private List<MineTile> bombTiles = new List<MineTile>();
+    private List<MineTile> flagTiles = new List<MineTile>();
+    
+    public event EventHandler ClickEvent;
 
     public MineTile this[int xindex, int yindex]
     {
@@ -45,7 +48,8 @@ public class GameGrid
                 Grid[i, j] = new MineTile(spriteSheet,
                     new Vector2(xOffset + i * MineTile.TILE_WIDTH, yOffset + j * MineTile.TILE_HEIGHT),
                     MineTile.TILE_WIDTH, MineTile.TILE_HEIGHT, i, j);
-                Grid[i, j].RevealEvent += TileReveal;
+                Grid[i, j].ClickEvent += OnClickTile;
+                Grid[i, j].FlagEvent += OnFlagTile;
             }
         }
     }
@@ -84,25 +88,34 @@ public class GameGrid
 
         return false;
     }
-
-
-    private void TileReveal(object sender, EventArgs e)
+    
+    protected virtual void OnClickEvent(MineTile tile)
     {
-        MineTile tile = (MineTile)sender;
+        EventHandler handler = ClickEvent;
+        handler?.Invoke(tile, EventArgs.Empty);
+    }
+
+    private void OnFlagTile(object sender, EventArgs e)
+    {
+        flagTiles.Add((MineTile) sender);
+    }
+    
+    private void OnClickTile(object sender, EventArgs e)
+    {
+        MineTile clickedTile = (MineTile)sender;
+        OnClickEvent(clickedTile);
 
         if (initialTile)
         {
-            SetBoard(tile, BOMB_COUNT);
+            SetBoard(clickedTile, BOMB_COUNT);
         }
 
-        if (tile.Index == 0)
-        {
-            tile.SetIndex(AdjacentBombCount(tile));
-            RevealAdjacentEmptyTiles(tile);
+        if (clickedTile.isEmpty()) {
+            clickedTile.SetIndex(AdjacentBombCount(clickedTile));
+            RevealAdjacentEmptyTiles(clickedTile);
         }
-        else if(tile.Index == -1)
-        {
-            RevealAllBombs(tile);
+        else if(clickedTile.isBomb()) {
+            RevealAllBombs(clickedTile);
         }
     }
 
@@ -113,8 +126,13 @@ public class GameGrid
         {
             bombTile.Hidden = false;
         }
+        foreach (MineTile flagTile in flagTiles)
+        {
+            if (!flagTile.isBomb())
+                flagTile.ShouldDisplayWrongfulFlagged = true;
+        }
     }
-
+    
     private void RevealAdjacentEmptyTiles(MineTile clickedTile)
     {
         int[] positions = { -1, 0, 1 };
@@ -134,7 +152,7 @@ public class GameGrid
                         {
                             adjacentTile.SetIndex(AdjacentBombCount(adjacentTile));
                             adjacentTile.Hidden = false;
-                            TileReveal(adjacentTile, EventArgs.Empty);
+                            OnClickTile(adjacentTile, EventArgs.Empty);
                         }
                     }
                 }
@@ -167,6 +185,6 @@ public class GameGrid
             }
         }
 
-        return bombCount > 0 ? bombCount : tile.Index;
+        return bombCount;
     }
 }

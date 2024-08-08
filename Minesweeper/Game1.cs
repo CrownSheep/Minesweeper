@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.Entities;
@@ -8,40 +9,38 @@ namespace Minesweeper;
 public class Game1 : Game
 {
     private const string GAME_TITLE = "Minesweeper";
-    
+
     private const string SPRITESHEET_ASSET_NAME = "minesweeper_spritesheet";
-    
+
     public const int WINDOW_WIDTH = 324;
     public const int WINDOW_HEIGHT = 464;
-    
+
     public const int DISPLAY_ZOOM_FACTOR = 2;
-    
+
     private const int GRID_X_OFFSET = 0;
     private const int GRID_Y_OFFSET = 70;
 
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
-    
+
     private Texture2D spriteSheetTexture;
-    
+
     private Matrix transformMatrix = Matrix.Identity * Matrix.CreateScale(DISPLAY_ZOOM_FACTOR, DISPLAY_ZOOM_FACTOR, 1);
 
-    private GameGrid game_grid;
-    
-    private EntityManager entityManager;
+    private GameGrid gameGrid;
+    private InfoBar infoBar;
 
     public Game1()
     {
         graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        entityManager = new EntityManager();
     }
 
     protected override void Initialize()
     {
         base.Initialize();
-        
+
         Window.Title = GAME_TITLE;
 
         graphics.PreferredBackBufferWidth = WINDOW_WIDTH;
@@ -54,14 +53,11 @@ public class Game1 : Game
     {
         spriteBatch = new SpriteBatch(GraphicsDevice);
         spriteSheetTexture = Content.Load<Texture2D>(SPRITESHEET_ASSET_NAME);
-        
-        game_grid = new GameGrid(spriteSheetTexture);
-        game_grid.Initialize(GRID_X_OFFSET, GRID_Y_OFFSET);
 
-        foreach (MineTile tile in game_grid.Grid)
-        {
-            entityManager.AddEntity(tile);
-        }
+        gameGrid = new GameGrid(spriteSheetTexture);
+        gameGrid.Initialize(GRID_X_OFFSET, GRID_Y_OFFSET);
+
+        infoBar = new InfoBar(spriteSheetTexture, new Vector2(15, 15), gameGrid);
     }
 
     protected override void Update(GameTime gameTime)
@@ -69,8 +65,13 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+
+        foreach (MineTile tile in gameGrid.Grid)
+        {
+            tile.Update(gameTime);
+        }
         
-        entityManager.UpdateEntities(gameTime);
+        infoBar.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -78,11 +79,16 @@ public class Game1 : Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.White);
+
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: transformMatrix);
+
+        foreach (MineTile tile in gameGrid.Grid)
+        {
+            tile.Draw(spriteBatch, gameTime);
+        }
         
-        spriteBatch.Begin(samplerState:SamplerState.PointClamp, transformMatrix: transformMatrix);
-        
-        entityManager.DrawEntities(spriteBatch, gameTime);
-        
+        infoBar.Draw(spriteBatch, gameTime);
+
         spriteBatch.End();
 
         base.Draw(gameTime);
