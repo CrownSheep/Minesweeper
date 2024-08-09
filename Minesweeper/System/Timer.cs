@@ -9,13 +9,15 @@ public class Timer
     private float remainingTime;
 
     private bool paused;
+    private bool loop;
     
     public event EventHandler FinishEvent;
 
-    public Timer(float duration)
+    public Timer(float duration, bool loop)
     {
         this.duration = duration;
         remainingTime = this.duration;
+        this.loop = loop;
     }
 
     public void setDuration(float duration)
@@ -32,18 +34,23 @@ public class Timer
     {
         remainingTime = 0;
     }
+    
+    public void Reset()
+    {
+        remainingTime = duration;
+    }
 
     public void Tick(GameTime gameTime)
     {
         float timer = (float) gameTime.ElapsedGameTime.TotalSeconds;
 
-        if(!paused)
+        if(!paused && remainingTime != -1)
             remainingTime -= timer;
 
-        if(remainingTime <= 0)
+        if(remainingTime is <= 0 and > -1)
         {
             OnFinishEvent();
-            remainingTime = duration;
+            remainingTime = loop ? duration : -1;
         }
     }
     

@@ -2,11 +2,13 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Minesweeper.DataHolders;
+using Minesweeper.GameElements;
 using Minesweeper.System;
 
 namespace Minesweeper.Entities;
 
-public class InfoBar : IGameEntity
+public class GameScreen : IGameEntity
 {
     
     private const int TEXTURE_COORDS_NUMBER_X = 0;
@@ -15,64 +17,57 @@ public class InfoBar : IGameEntity
     private const int TEXTURE_COORDS_NUMBER_WIDTH = 13;
     private const int TEXTURE_COORDS_NUMBER_HEIGHT = 23;
     
+    
+    private const int GRID_X_OFFSET = 0;
+    private const int GRID_Y_OFFSET = 70;
+    
     public int DrawOrder => 100;
-
-    private Timer timer = new Timer(1);
     public Vector2 Position { get; set; }
 
     private Texture2D spriteSheet;
-
-    private int secondsPassed;
     
-    private GameGrid gameGrid;
+    private GridManager gridManager;
 
-    public InfoBar(Texture2D spriteSheet, Vector2 position, GameGrid gameGrid)
+    private TopSectionManager topSectionManager;
+
+    public GameScreen(Texture2D spriteSheet, Vector2 position)
     {
         this.spriteSheet = spriteSheet;
         Position = position;
-        timer.FinishEvent += onSecondIncrement;
-        timer.setPaused(true);
-        this.gameGrid = gameGrid;
-        this.gameGrid.ClickEvent += onClickEvent;
+        gridManager = new GridManager(this.spriteSheet);
+        gridManager.Initialize(GRID_X_OFFSET, GRID_Y_OFFSET);
+        topSectionManager = new TopSectionManager(gridManager);
     }
     
     public void Update(GameTime gameTime)
     {
-        timer.Tick(gameTime);
+        topSectionManager.timer.Tick(gameTime);
+
+        if (KeyboardInputManager.WasJustPressed(Keys.R))
+        {
+            gridManager.ResetBoard();
+        }
+        
+        foreach (MineTile tile in gridManager.Grid)
+        {
+            tile.Update(gameTime);
+        }
     }
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
     {
-        DrawNumber(spriteBatch, secondsPassed, Position.X);
-    }
-
-    
-    private void onSecondIncrement(object sender, EventArgs e)
-    {
-        secondsPassed++;
-    }
-    
-    private void onClickEvent(object sender, EventArgs e)
-    {
-        MineTile tile = (MineTile) sender;
-        OnClickEventArgs clickEventArgs = (OnClickEventArgs) e;
-        if (clickEventArgs.button == Mouse.GetState().LeftButton)
+        DrawNumber(spriteBatch, topSectionManager.ElapsedSeconds, Position.X);
+        DrawNumber(spriteBatch, topSectionManager.LeftFlags, Position.X + 100);
+        
+        foreach (MineTile tile in gridManager.Grid)
         {
-            if (!tile.Flagged)
-                timer.setPaused(false);
-
-            if (tile.isBomb())
-                timer.setPaused(true);
-        } else if (clickEventArgs.button == Mouse.GetState().RightButton)
-        {
-            
+            tile.Draw(spriteBatch, gameTime);
         }
-
     }
     
     private void DrawNumber(SpriteBatch spriteBatch, int number, float startPosX)
     {
-        int[] scoreDigits = SplitDigits(number);
+        int[] scoreDigits = SplitDigits(Math.Abs(number));
 
         float posX = startPosX;
 
@@ -85,6 +80,14 @@ public class InfoBar : IGameEntity
             spriteBatch.Draw(spriteSheet, screenPos, textureCoords, Color.White);
 
             posX += TEXTURE_COORDS_NUMBER_WIDTH;
+        }
+
+        if (number < 0)
+        {
+            int minusPosX = TEXTURE_COORDS_NUMBER_X + 10 * TEXTURE_COORDS_NUMBER_WIDTH;
+            spriteBatch.Draw(spriteSheet, new Vector2(startPosX, Position.Y),
+                new Rectangle(minusPosX, TEXTURE_COORDS_NUMBER_Y, TEXTURE_COORDS_NUMBER_WIDTH,
+                    TEXTURE_COORDS_NUMBER_HEIGHT), Color.White);
         }
     }
     

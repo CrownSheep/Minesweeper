@@ -2,9 +2,10 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Minesweeper.Entities;
 using Minesweeper.Graphics;
 
-namespace Minesweeper.Entities;
+namespace Minesweeper.GameElements;
 
 public class MineTile : Clickable
 {
@@ -25,13 +26,14 @@ public class MineTile : Clickable
     public Sprite Sprite { get; private set; }
     
     public int Index { get; private set; }
-    public bool Hidden { get; set; }
+    private bool Hidden { get; set; }
     public bool Flagged { get; set; }
     public bool ShouldDisplayWrongfulFlagged { get; set; }
 
     private Texture2D spriteSheet;
     
     public event EventHandler ClickEvent;
+    public event EventHandler RevealEvent;
     public event EventHandler FlagEvent;
 
     public int xIndex;
@@ -101,6 +103,16 @@ public class MineTile : Clickable
     {
         Index = MathHelper.Clamp(index, -2, 8);
     }
+
+    public void SetHidden(bool hidden)
+    {
+        Hidden = hidden;
+    }
+
+    public bool IsHidden()
+    {
+        return Hidden;
+    }
     
     public void setSpriteByIndex(int index)
     {
@@ -109,29 +121,27 @@ public class MineTile : Clickable
 
     protected override void OnLeftMouseClick()
     {
-        Reveal(Mouse.GetState().LeftButton);
+        OnClickEvent(Mouse.GetState().LeftButton);
     }
     
     protected override void OnRightMouseClick()
     {
-        Flag();
+        OnClickEvent(Mouse.GetState().RightButton);
     }
     
     public void Flag()
     {
         Flagged = !Flagged;
-        OnFlagEvent();
+        OnFlagEvent(Flagged);
     }
 
-    public void Reveal(ButtonState buttonState)
+    public void Reveal()
     {
         if (!Flagged)
         {
             if (Hidden)
             {
-                OnClickEvent(buttonState);
-                Hidden = false;
-                setSpriteByIndex(Index);
+                OnRevealEvent();
             }
         }
     }
@@ -147,10 +157,16 @@ public class MineTile : Clickable
         handler?.Invoke(this, new OnClickEventArgs(buttonState));
     }
     
-    protected virtual void OnFlagEvent()
+    protected virtual void OnRevealEvent()
+    {
+        EventHandler handler = RevealEvent;
+        handler?.Invoke(this, EventArgs.Empty);
+    }
+    
+    protected virtual void OnFlagEvent(bool flagged)
     {
         EventHandler handler = FlagEvent;
-        handler?.Invoke(this, EventArgs.Empty);
+        handler?.Invoke(this, new OnFlagEventArgs(flagged));
     }
 
     public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)

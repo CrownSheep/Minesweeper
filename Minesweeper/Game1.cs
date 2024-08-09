@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.Entities;
+using Minesweeper.GameElements;
 
 namespace Minesweeper;
 
@@ -12,13 +13,10 @@ public class Game1 : Game
 
     private const string SPRITESHEET_ASSET_NAME = "minesweeper_spritesheet";
 
-    public const int WINDOW_WIDTH = 324;
-    public const int WINDOW_HEIGHT = 464;
+    public const int WINDOW_WIDTH = 324 * 2;
+    public const int WINDOW_HEIGHT = 464 * 2;
 
-    public const int DISPLAY_ZOOM_FACTOR = 2;
-
-    private const int GRID_X_OFFSET = 0;
-    private const int GRID_Y_OFFSET = 70;
+    public const int DISPLAY_ZOOM_FACTOR = 3;
 
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
@@ -27,8 +25,8 @@ public class Game1 : Game
 
     private Matrix transformMatrix = Matrix.Identity * Matrix.CreateScale(DISPLAY_ZOOM_FACTOR, DISPLAY_ZOOM_FACTOR, 1);
 
-    private GameGrid gameGrid;
-    private InfoBar infoBar;
+    private GridManager _gridManager;
+    private GameScreen _gameScreen;
 
     public Game1()
     {
@@ -54,10 +52,7 @@ public class Game1 : Game
         spriteBatch = new SpriteBatch(GraphicsDevice);
         spriteSheetTexture = Content.Load<Texture2D>(SPRITESHEET_ASSET_NAME);
 
-        gameGrid = new GameGrid(spriteSheetTexture);
-        gameGrid.Initialize(GRID_X_OFFSET, GRID_Y_OFFSET);
-
-        infoBar = new InfoBar(spriteSheetTexture, new Vector2(15, 15), gameGrid);
+        _gameScreen = new GameScreen(spriteSheetTexture, new Vector2(0, 0));
     }
 
     protected override void Update(GameTime gameTime)
@@ -65,13 +60,8 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
-
-        foreach (MineTile tile in gameGrid.Grid)
-        {
-            tile.Update(gameTime);
-        }
         
-        infoBar.Update(gameTime);
+        _gameScreen.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -81,13 +71,8 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.White);
 
         spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: transformMatrix);
-
-        foreach (MineTile tile in gameGrid.Grid)
-        {
-            tile.Draw(spriteBatch, gameTime);
-        }
         
-        infoBar.Draw(spriteBatch, gameTime);
+        _gameScreen.Draw(spriteBatch, gameTime);
 
         spriteBatch.End();
 

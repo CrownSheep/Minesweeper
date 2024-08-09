@@ -5,10 +5,15 @@ namespace Minesweeper;
 
 public class OnClickEventArgs : EventArgs
 {
-    public readonly ButtonState button;
+    private readonly ButtonState button;
 
     public OnClickEventArgs(ButtonState button)
     {
         this.button = button;
+    }
+    
+    public ButtonState Button
+    {
+        get { return button; }
     }
 }
