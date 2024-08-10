@@ -18,8 +18,11 @@ public abstract class Clickable : IGameEntity
     
     private MouseState previousMouseState;
 
-    protected Clickable(Vector2 position, int width, int height)
+    private Game1 game;
+
+    protected Clickable(Game1 game, Vector2 position, int width, int height)
     {
+        this.game = game;
         Position = position;
         Width = width;
         Height = height;
@@ -29,15 +32,18 @@ public abstract class Clickable : IGameEntity
     public virtual void Update(GameTime gameTime)
     {
         MouseState mouseState = Mouse.GetState();
-        
-        if (Bounds.Contains(mouseState.Position))
+
+        if (game.IsActive)
         {
-            if(mouseButtonClicked(mouseState.LeftButton, previousMouseState.LeftButton))
-                OnLeftMouseClick();
-            if(mouseButtonClicked(mouseState.RightButton, previousMouseState.RightButton))
-                OnRightMouseClick();
-            if(mouseButtonClicked(mouseState.MiddleButton, previousMouseState.MiddleButton))
-                OnMiddleMouseClick();
+            if (Bounds.Contains(mouseState.Position))
+            {
+                if (mouseButtonClicked(mouseState.LeftButton, previousMouseState.LeftButton))
+                    OnLeftMouseClick();
+                if (mouseButtonClicked(mouseState.RightButton, previousMouseState.RightButton))
+                    OnRightMouseClick();
+                if (mouseButtonClicked(mouseState.MiddleButton, previousMouseState.MiddleButton))
+                    OnMiddleMouseClick();
+            }
         }
 
         previousMouseState = mouseState;

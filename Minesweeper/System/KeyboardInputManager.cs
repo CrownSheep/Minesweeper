@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using System;
+using Microsoft.Xna.Framework.Input;
 
 namespace Minesweeper.System;
 
@@ -15,6 +16,7 @@ public static class KeyboardInputManager
         bool wasKeyPressed = previousKeyboardState.IsKeyDown(key);
 
         previousKeyboardState = KeyboardState;
+        
 
         return !wasKeyPressed && isKeyPressed;
     }

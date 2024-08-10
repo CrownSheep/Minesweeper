@@ -2,8 +2,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Minesweeper.DataHolders;
 using Minesweeper.Entities;
-using Minesweeper.GameElements;
 
 namespace Minesweeper;
 
@@ -13,8 +13,8 @@ public class Game1 : Game
 
     private const string SPRITESHEET_ASSET_NAME = "minesweeper_spritesheet";
 
-    public const int WINDOW_WIDTH = 324 * 2;
-    public const int WINDOW_HEIGHT = 464 * 2;
+    public const int WINDOW_WIDTH = GridManager.COLUMNS * 18 + 20;
+    public const int WINDOW_HEIGHT = 56 + GridManager.ROWS * 18 + 10;
 
     public const int DISPLAY_ZOOM_FACTOR = 3;
 
@@ -24,9 +24,8 @@ public class Game1 : Game
     private Texture2D spriteSheetTexture;
 
     private Matrix transformMatrix = Matrix.Identity * Matrix.CreateScale(DISPLAY_ZOOM_FACTOR, DISPLAY_ZOOM_FACTOR, 1);
-
-    private GridManager _gridManager;
-    private GameScreen _gameScreen;
+    
+    private GameRenderer gameRenderer;
 
     public Game1()
     {
@@ -41,8 +40,8 @@ public class Game1 : Game
 
         Window.Title = GAME_TITLE;
 
-        graphics.PreferredBackBufferWidth = WINDOW_WIDTH;
-        graphics.PreferredBackBufferHeight = WINDOW_HEIGHT;
+        graphics.PreferredBackBufferWidth = WINDOW_WIDTH * DISPLAY_ZOOM_FACTOR;
+        graphics.PreferredBackBufferHeight = WINDOW_HEIGHT * DISPLAY_ZOOM_FACTOR;
         graphics.SynchronizeWithVerticalRetrace = true;
         graphics.ApplyChanges();
     }
@@ -52,7 +51,7 @@ public class Game1 : Game
         spriteBatch = new SpriteBatch(GraphicsDevice);
         spriteSheetTexture = Content.Load<Texture2D>(SPRITESHEET_ASSET_NAME);
 
-        _gameScreen = new GameScreen(spriteSheetTexture, new Vector2(0, 0));
+        gameRenderer = new GameRenderer(this, spriteSheetTexture);
     }
 
     protected override void Update(GameTime gameTime)
@@ -61,7 +60,7 @@ public class Game1 : Game
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
         
-        _gameScreen.Update(gameTime);
+        gameRenderer.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -72,7 +71,7 @@ public class Game1 : Game
 
         spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: transformMatrix);
         
-        _gameScreen.Draw(spriteBatch, gameTime);
+        gameRenderer.Draw(spriteBatch, gameTime);
 
         spriteBatch.End();
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Input;
-using Minesweeper.GameElements;
 using Minesweeper.System;
 
 namespace Minesweeper.DataHolders;
@@ -25,17 +24,25 @@ public class TopSectionManager
     {
         ElapsedSeconds++;
     }
+
+    public void ResetTime()
+    {
+        ElapsedSeconds = 0;
+    }
     
     private void OnClickEvent(object sender, EventArgs e)
     {
-        MineTile tile = (MineTile) sender;
+        TileManager tile = (TileManager) sender;
         OnClickEventArgs clickEventArgs = (OnClickEventArgs) e;
         if (clickEventArgs.Button == Mouse.GetState().LeftButton)
         {
+            if(gridManager.revealedBombs)
+                return;
+            
             if (!tile.Flagged)
                 timer.setPaused(false);
 
-            if (tile.isBomb())
+            if (tile.IsBomb())
                 timer.setPaused(true);
         }
     }
