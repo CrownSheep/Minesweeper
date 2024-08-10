@@ -13,10 +13,10 @@ public class Game1 : Game
 
     private const string SPRITESHEET_ASSET_NAME = "minesweeper_spritesheet";
 
-    public const int WINDOW_WIDTH = GridManager.COLUMNS * 18 + 20;
-    public const int WINDOW_HEIGHT = 56 + GridManager.ROWS * 18 + 10;
+    public const int DISPLAY_ZOOM_FACTOR = 2;
 
-    public const int DISPLAY_ZOOM_FACTOR = 3;
+    public int WindowWidth => Config.width * 18 + 20;
+    public int WindowHeight => 56 + Config.height * 18 + 10;
 
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
@@ -25,7 +25,9 @@ public class Game1 : Game
 
     private Matrix transformMatrix = Matrix.Identity * Matrix.CreateScale(DISPLAY_ZOOM_FACTOR, DISPLAY_ZOOM_FACTOR, 1);
     
-    private GameRenderer gameRenderer;
+    private GameManager gameManager;
+    public GameConfig DefaultConfig => GameConfig.BEGINNER;
+    public GameConfig Config { get; private set; }
 
     public Game1()
     {
@@ -40,8 +42,8 @@ public class Game1 : Game
 
         Window.Title = GAME_TITLE;
 
-        graphics.PreferredBackBufferWidth = WINDOW_WIDTH * DISPLAY_ZOOM_FACTOR;
-        graphics.PreferredBackBufferHeight = WINDOW_HEIGHT * DISPLAY_ZOOM_FACTOR;
+        graphics.PreferredBackBufferWidth = WindowWidth * DISPLAY_ZOOM_FACTOR;
+        graphics.PreferredBackBufferHeight = WindowHeight * DISPLAY_ZOOM_FACTOR;
         graphics.SynchronizeWithVerticalRetrace = true;
         graphics.ApplyChanges();
     }
@@ -51,7 +53,8 @@ public class Game1 : Game
         spriteBatch = new SpriteBatch(GraphicsDevice);
         spriteSheetTexture = Content.Load<Texture2D>(SPRITESHEET_ASSET_NAME);
 
-        gameRenderer = new GameRenderer(this, spriteSheetTexture);
+        LoadGameWithConfig(DefaultConfig);
+        gameManager = new GameManager(this, spriteSheetTexture, Config);
     }
 
     protected override void Update(GameTime gameTime)
@@ -60,7 +63,7 @@ public class Game1 : Game
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
         
-        gameRenderer.Update(gameTime);
+        gameManager.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -71,10 +74,24 @@ public class Game1 : Game
 
         spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: transformMatrix);
         
-        gameRenderer.Draw(spriteBatch, gameTime);
+        gameManager.Draw(spriteBatch, gameTime);
 
         spriteBatch.End();
 
         base.Draw(gameTime);
+    }
+
+    private void RefreshWindowDimensions()
+    {
+        graphics.PreferredBackBufferWidth = WindowWidth * DISPLAY_ZOOM_FACTOR;
+        graphics.PreferredBackBufferHeight = WindowHeight * DISPLAY_ZOOM_FACTOR;
+        graphics.ApplyChanges();
+    }
+
+    public void LoadGameWithConfig(GameConfig config)
+    {
+        Config = config;
+        gameManager = new GameManager(this, spriteSheetTexture, Config);
+        RefreshWindowDimensions();
     }
 }

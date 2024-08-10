@@ -4,12 +4,11 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.DataHolders;
 using Minesweeper.Extensions;
-using Minesweeper.NineSliceSystem;
 using Minesweeper.System;
 
 namespace Minesweeper.Entities;
 
-public class GameRenderer : IGameEntity
+public class GameManager
 {
     private const int TEXTURE_COORDS_NUMBER_X = 0;
     private const int TEXTURE_COORDS_NUMBER_Y = 0;
@@ -18,7 +17,6 @@ public class GameRenderer : IGameEntity
     private const int TEXTURE_COORDS_NUMBER_HEIGHT = 23;
 
     private const int GRID_X_OFFSET = 0;
-
     public int DrawOrder => 100;
 
     private Texture2D spriteSheet;
@@ -28,21 +26,23 @@ public class GameRenderer : IGameEntity
     private TopSectionManager topSectionManager;
 
     private TopSectionFrame topSectionFrame;
+    
     private GridFrame gridFrame;
 
-    public GameRenderer(Game1 game,Texture2D spriteSheet)
+    public GameManager(Game1 game, Texture2D spriteSheet, GameConfig config)
     {
         this.spriteSheet = spriteSheet;
-        gridManager = new GridManager(game, this.spriteSheet);
-        topSectionFrame = new TopSectionFrame(0, 0, Game1.WINDOW_WIDTH, 56);
-        gridFrame = new GridFrame(0, topSectionFrame.Height - 10, GridManager.COLUMNS * 18 + 20, GridManager.ROWS * 18 + 20);
-        gridManager.Initialize(topSectionFrame.X + 10, topSectionFrame.Height);
-        topSectionManager = new TopSectionManager(gridManager);
+        topSectionFrame = new TopSectionFrame(0, 0, game.WindowWidth, 56);
+        gridManager = new GridManager(game, this.spriteSheet, new Vector2(topSectionFrame.X + 10, topSectionFrame.Height));
+        gridFrame = new GridFrame(0, topSectionFrame.Height - 10, game.WindowWidth, game.WindowHeight - 56 + 10);
+        gridManager.Initialize(config);
+        topSectionManager = new TopSectionManager(game, gridManager);
     }
 
     public void Update(GameTime gameTime)
     {
         topSectionManager.timer.Tick(gameTime);
+        topSectionManager.Update();
 
         if (KeyboardInputManager.WasJustPressed(Keys.R))
         {
@@ -74,7 +74,7 @@ public class GameRenderer : IGameEntity
 
         foreach (TileManager tile in gridManager.Grid)
         {
-            tile.Draw(spriteBatch, gameTime);
+            tile.GetSpriteByIndex(tile.Index).Draw(spriteBatch, tile.Position);
         }
     }
 

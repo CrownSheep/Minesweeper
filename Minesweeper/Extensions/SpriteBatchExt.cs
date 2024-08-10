@@ -18,7 +18,7 @@ public static class SpriteBatchExt
         spriteBatch.Draw(texture, rectangle, color);
     }
     
-    public static void CreateBorder(this SpriteBatch spriteBatch, Rectangle rectangle, Color color, int lineWidth) {
+    public static void DrawBorder(this SpriteBatch spriteBatch, Rectangle rectangle, Color color, int lineWidth) {
         if (spriteBatch is null)
             throw new ArgumentNullException(nameof(spriteBatch));
         

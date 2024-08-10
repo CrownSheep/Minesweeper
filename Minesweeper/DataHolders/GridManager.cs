@@ -3,23 +3,17 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Minesweeper.Entities;
 
 namespace Minesweeper.DataHolders;
 
 public class GridManager
 {
-    public const int COLUMNS = 9;
-    public const int ROWS = 9;
-
-    public TileManager[,] Grid { get; } = new TileManager[COLUMNS, ROWS];
+    public TileManager[,] Grid { get; private set; }
 
     private Texture2D spriteSheet;
 
     private bool initialTile = true;
-
-    public const int BOMB_COUNT = 10;
-
-    private int placedBombs = 0;
 
     private Random random;
 
@@ -28,28 +22,34 @@ public class GridManager
 
     public bool revealedBombs;
     public event EventHandler ClickEvent;
-    public event EventHandler FlagEvent;
 
     public int FlagCount => flagTiles.Count;
     public TileManager this[int xindex, int yindex] => Grid[xindex, yindex];
 
     private Game1 game;
 
-    public GridManager(Game1 game, Texture2D spriteSheet)
+    public GameConfig Config { get; private set; }
+
+    private Vector2 Position { get; }
+
+    public GridManager(Game1 game, Texture2D spriteSheet, Vector2 position)
     {
         this.game = game;
         this.spriteSheet = spriteSheet;
         random = new Random();
+        Position = position;
     }
 
-    public void Initialize(int xOffset, int yOffset)
+    public void Initialize(GameConfig config)
     {
+        Config = config;
+        Grid = new TileManager[Config.width, Config.height];
         for (int i = 0; i < Grid.GetLength(0); i++)
         {
             for (int j = 0; j < Grid.GetLength(1); j++)
             {
                 Grid[i, j] = new TileManager(game, spriteSheet,
-                    new Vector2(xOffset + i * TileManager.TILE_WIDTH, yOffset + j * TileManager.TILE_HEIGHT),
+                    new Vector2(Position.X + i * TileManager.TILE_WIDTH, Position.Y + j * TileManager.TILE_HEIGHT),
                     TileManager.TILE_WIDTH, TileManager.TILE_HEIGHT, i, j);
                 Grid[i, j].ClickEvent += OnClickTile;
                 Grid[i, j].RevealEvent += OnRevealTile;
@@ -79,12 +79,12 @@ public class GridManager
         int bombsPlaced = 0;
         while (bombsPlaced < bombCount)
         {
-            int randX = random.Next(ROWS);
-            int randY = random.Next(COLUMNS);
+            int randX = random.Next(Config.width);
+            int randY = random.Next(Config.height);
             TileManager randTile = Grid[randX, randY];
             if (!randTile.IsBomb() && !InZone(randTile.indexs, safeTile.indexs))
             {
-                randTile.SetIndex(-1);
+                randTile.SetIndex(TileManager.BOMB_INDEX);
                 bombsPlaced++;
                 bombTiles.Add(randTile);
             }
@@ -147,8 +147,9 @@ public class GridManager
             {
                 if (initialTile)
                 {
-                    SetBombs(clickedTile, BOMB_COUNT);
-                    // RevealAllBombs(clickedTile);
+                    SetBombs(clickedTile, Config.bombCount);
+                    if(Config.showBombsAtStart)
+                        RevealAllBombs(clickedTile);
                 }
 
                 if (clickedTile.IsEmpty())
@@ -158,7 +159,14 @@ public class GridManager
                     RevealAdjacentEmptyTiles(clickedTile, button);
                     if (Won())
                     {
-                        Console.WriteLine("Won!");
+                        foreach (TileManager bombTile in bombTiles)
+                        {
+                            if(!bombTile.Flagged)
+                                flagTiles.Add(bombTile);
+                            
+                            bombTile.Flagged = true;
+                            bombTile.Hidden = true;
+                        }
                     }
                 }
                 else if (clickedTile.IsBomb())
@@ -216,12 +224,12 @@ public class GridManager
                 int adjacentX = clickedTile.xIndex + xPosition;
                 int adjacentY = clickedTile.yIndex + yPosition;
 
-                if (adjacentX >= 0 && adjacentY >= 0 && adjacentX < ROWS && adjacentY < COLUMNS)
+                if (adjacentX >= 0 && adjacentY >= 0 && adjacentX < Config.width && adjacentY < Config.height)
                 {
                     TileManager adjacentTile = Grid[adjacentX, adjacentY];
-                    if (clickedTile.Index == 0)
+                    if (clickedTile.IsEmpty())
                     {
-                        if (adjacentTile.Index == 0 && adjacentTile.IsHidden())
+                        if (adjacentTile.IsEmpty() && adjacentTile.IsHidden())
                         {
                             adjacentTile.SetIndex(AdjacentBombCount(adjacentTile));
                             adjacentTile.Hidden = false;
@@ -245,12 +253,12 @@ public class GridManager
                 int adjacentX = tile.xIndex + xPosition;
                 int adjacentY = tile.yIndex + yPosition;
 
-                if (adjacentX >= 0 && adjacentY >= 0 && adjacentX < ROWS && adjacentY < COLUMNS ||
+                if (adjacentX >= 0 && adjacentY >= 0 && adjacentX < Config.width && adjacentY < Config.height ||
                     (xPosition == 0 && yPosition == 0))
                 {
                     TileManager adjacentTile = Grid[adjacentX, adjacentY];
 
-                    if (adjacentTile.Index == -1)
+                    if (adjacentTile.IsBomb())
                     {
                         bombCount++;
                     }

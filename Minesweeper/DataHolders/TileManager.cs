@@ -14,8 +14,8 @@ public class TileManager : Clickable
     public const int TILE_WIDTH = 18;
     public const int TILE_HEIGHT = 18;
     
-    private const int BOMB_INDEX = -1;
-    private const int EMPTY_INDEX = 0;
+    public const int BOMB_INDEX = -1;
+    public const int EMPTY_INDEX = 0;
 
     private Sprite HiddenSprite => new Sprite(spriteSheet, 0, 47, TILE_WIDTH, TILE_HEIGHT);
     private Sprite FlagSprite => new Sprite(spriteSheet, 36, 47, TILE_WIDTH, TILE_HEIGHT);
@@ -53,12 +53,7 @@ public class TileManager : Clickable
         Flagged = false;
     }
 
-    public override void Update(GameTime gameTime)
-    {
-        base.Update(gameTime);
-    }
-
-    private Sprite GetSpriteByIndex(int index)
+    public Sprite GetSpriteByIndex(int index)
     {
         if (Hidden)
         {
@@ -152,9 +147,4 @@ public class TileManager : Clickable
     {
         return Index == EMPTY_INDEX;
     }
-    public override void Draw(SpriteBatch spriteBatch, GameTime gameTime)
-    {
-        GetSpriteByIndex(Index).Draw(spriteBatch, Position);
-    }
-    
 }

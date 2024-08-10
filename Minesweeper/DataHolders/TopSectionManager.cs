@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.System;
 
@@ -6,23 +7,57 @@ namespace Minesweeper.DataHolders;
 
 public class TopSectionManager
 {
+    private const int MIN_INACTIVE_TIME = 10;
     public readonly Timer timer = new Timer(1, true);
     public int ElapsedSeconds { get; private set; }
-    public int LeftFlags => GridManager.BOMB_COUNT - gridManager.FlagCount;
+    public int InactiveSeconds { get; private set; }
+    public int LeftFlags => game.Config.bombCount - gridManager.FlagCount;
 
     private GridManager gridManager;
 
-    public TopSectionManager(GridManager gridManager)
+    private Game1 game;
+
+    public TopSectionManager(Game1 game, GridManager gridManager)
     {
+        this.game = game;
         timer.FinishEvent += OnSecondIncrement;
         timer.setPaused(true);
         this.gridManager = gridManager;
         this.gridManager.ClickEvent += OnClickEvent;
     }
+
+    public void Update()
+    {
+        if (game.IsActive)
+        {
+            timer.setDuration(InactiveSeconds > MIN_INACTIVE_TIME ? 0.02f : 1f);
+        }
+    }
     
     private void OnSecondIncrement(object sender, EventArgs e)
     {
-        ElapsedSeconds++;
+        if (!game.IsActive)
+        {
+            InactiveSeconds++;
+            if (InactiveSeconds <= MIN_INACTIVE_TIME)
+            {
+                ElapsedSeconds++;
+            }
+        }
+        else
+        {
+            if (InactiveSeconds > MIN_INACTIVE_TIME)
+            {
+                InactiveSeconds--;
+            }
+            else
+            {
+                InactiveSeconds = 0;
+            }
+            
+            if(ElapsedSeconds < 999)
+                ElapsedSeconds++;
+        }
     }
 
     public void ResetTime()

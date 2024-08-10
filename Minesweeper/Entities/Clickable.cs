@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Minesweeper.Entities;
 
-public abstract class Clickable : IGameEntity
+public abstract class Clickable
 {
     public Vector2 Position { get; }
     public int Width { get; }
@@ -68,6 +68,4 @@ public abstract class Clickable : IGameEntity
     {
         
     }
-
-    public abstract void Draw(SpriteBatch spriteBatch, GameTime gameTime);
 }
