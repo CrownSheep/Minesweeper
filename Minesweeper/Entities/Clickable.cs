@@ -1,7 +1,6 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Minesweeper.System;
 
 namespace Minesweeper.Entities;
 
@@ -10,15 +9,13 @@ public abstract class Clickable
     public Vector2 Position { get; }
     public int Width { get; }
     public int Height { get; }
-    
-    public int DrawOrder { get; }
-    
-    private Rectangle Bounds => new Rectangle((Position * Game1.DISPLAY_ZOOM_FACTOR).ToPoint(),
-        new Point(Width * Game1.DISPLAY_ZOOM_FACTOR, Height * Game1.DISPLAY_ZOOM_FACTOR));
-    
+
+    protected Rectangle Bounds => new Rectangle((Position * game.ZoomFactor).ToPoint(),
+        new Point((int) (Width * game.ZoomFactor), (int) (Height * game.ZoomFactor)));
+
     private MouseState previousMouseState;
 
-    private Game1 game;
+    protected Game1 game;
 
     protected Clickable(Game1 game, Vector2 position, int width, int height)
     {
@@ -27,7 +24,7 @@ public abstract class Clickable
         Width = width;
         Height = height;
     }
-    
+
 
     public virtual void Update(GameTime gameTime)
     {
@@ -35,37 +32,34 @@ public abstract class Clickable
 
         if (game.IsActive)
         {
-            if (Bounds.Contains(mouseState.Position))
+            if (MouseInputManager.Hover(Bounds))
             {
-                if (mouseButtonClicked(mouseState.LeftButton, previousMouseState.LeftButton))
+                if(MouseInputManager.IsLeftClicked(true))
                     OnLeftMouseClick();
-                if (mouseButtonClicked(mouseState.RightButton, previousMouseState.RightButton))
+                if (MouseInputManager.IsRightClicked(false))
                     OnRightMouseClick();
-                if (mouseButtonClicked(mouseState.MiddleButton, previousMouseState.MiddleButton))
-                    OnMiddleMouseClick();
+                // if (MouseInputManager.IsMiddleClicked(false))
+                //     OnMiddleMouseClick();
             }
         }
 
         previousMouseState = mouseState;
     }
 
-    private bool mouseButtonClicked(ButtonState button, ButtonState previousButton)
+    protected bool canInteract()
     {
-        return button == ButtonState.Pressed && previousButton != ButtonState.Pressed;
+        return game.IsActive && MouseInputManager.Hover(Bounds);
     }
 
     protected virtual void OnLeftMouseClick()
     {
-        
     }
-    
+
     protected virtual void OnRightMouseClick()
     {
-        
     }
-    
+
     protected virtual void OnMiddleMouseClick()
     {
-        
     }
 }

@@ -1,18 +1,19 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Input;
+using Minesweeper.System;
 
 namespace Minesweeper;
 
 public class OnClickEventArgs : EventArgs
 {
-    private readonly ButtonState button;
+    private readonly MouseButtons button;
 
-    public OnClickEventArgs(ButtonState button)
+    public OnClickEventArgs(MouseButtons button)
     {
         this.button = button;
     }
     
-    public ButtonState Button
+    public MouseButtons Button
     {
         get { return button; }
     }

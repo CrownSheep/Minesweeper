@@ -2,10 +2,9 @@
 {
     public enum GameState
     {
-        Initial,
         Playing,
-        Dead,
-        Win,
-        Paused
+        Held,
+        Lose,
+        Win
     }
 }

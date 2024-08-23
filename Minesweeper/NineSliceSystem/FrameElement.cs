@@ -43,9 +43,6 @@ public record FrameElement
                 new Vector2(x + width / textureWidth * textureWidth, y),
                 new Rectangle(textureX, textureY, width % textureWidth, textureHeight),
                 Color.White);
-            spriteBatch.DrawBorder(
-                new Rectangle(x + width / textureWidth * textureWidth, y, width % textureWidth, textureHeight),
-                Color.Red, 1);
         }
 
         for (int i = 0; i < height / textureHeight; i++)
@@ -60,9 +57,6 @@ public record FrameElement
                 new Vector2(x, y + height / textureHeight * textureHeight),
                 new Rectangle(textureX, textureY, textureWidth, height % textureHeight),
                 Color.White);
-            spriteBatch.DrawBorder(
-                new Rectangle(x, y + height / textureHeight * textureHeight, textureWidth, height % textureHeight),
-                Color.Red, 1);
         }
     }
 }

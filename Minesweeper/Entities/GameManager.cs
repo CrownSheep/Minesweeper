@@ -15,10 +15,7 @@ public class GameManager
 
     private const int TEXTURE_COORDS_NUMBER_WIDTH = 13;
     private const int TEXTURE_COORDS_NUMBER_HEIGHT = 23;
-
-    private const int GRID_X_OFFSET = 0;
-    public int DrawOrder => 100;
-
+    
     private Texture2D spriteSheet;
 
     private GridManager gridManager;
@@ -26,17 +23,36 @@ public class GameManager
     private TopSectionManager topSectionManager;
 
     private TopSectionFrame topSectionFrame;
-    
+
     private GridFrame gridFrame;
+
+    private GameStateManager gameStateManager;
+    
+    private Game1 game;
 
     public GameManager(Game1 game, Texture2D spriteSheet, GameConfig config)
     {
+        this.game = game;
         this.spriteSheet = spriteSheet;
         topSectionFrame = new TopSectionFrame(0, 0, game.WindowWidth, 56);
-        gridManager = new GridManager(game, this.spriteSheet, new Vector2(topSectionFrame.X + 10, topSectionFrame.Height));
+        gridManager = new GridManager(game, new Vector2(topSectionFrame.X + 10, topSectionFrame.Height));
+        gridManager.LoseEvent += OnLose;
+        gridManager.WinEvent += OnWin;
         gridFrame = new GridFrame(0, topSectionFrame.Height - 10, game.WindowWidth, game.WindowHeight - 56 + 10);
         gridManager.Initialize(config);
         topSectionManager = new TopSectionManager(game, gridManager);
+        gameStateManager = new GameStateManager(game, new Vector2(game.WindowWidth / 2 - GameStateManager.SPRITE_WIDTH / 2, topSectionFrame.Y + 16),
+            GameStateManager.SPRITE_WIDTH, GameStateManager.SPRITE_HEIGHT, topSectionManager.ResetTime);
+    }
+
+    public void OnLose(object sender, EventArgs args)
+    {
+        topSectionManager.timer.setPaused(true);
+    }
+    
+    public void OnWin(object sender, EventArgs args)
+    {
+        topSectionManager.timer.setPaused(true);
     }
 
     public void Update(GameTime gameTime)
@@ -44,17 +60,9 @@ public class GameManager
         topSectionManager.timer.Tick(gameTime);
         topSectionManager.Update();
 
-        if (KeyboardInputManager.WasJustPressed(Keys.R))
-        {
-            gridManager.ResetBoard();
-        }
+        gameStateManager.Update(gameTime);
 
-        if (KeyboardInputManager.WasJustPressed(Keys.T))
-        {
-            topSectionManager.ResetTime();
-        }
-
-        foreach (TileManager tile in gridManager.Grid)
+        foreach (GridTile tile in gridManager.Grid)
         {
             tile.Update(gameTime);
         }
@@ -66,15 +74,19 @@ public class GameManager
         gridFrame.Draw(spriteBatch, spriteSheet);
 
         spriteBatch.DrawRectangle(
-            new Rectangle(topSectionFrame.X + 10, topSectionFrame.Y + 10, topSectionFrame.Width - 20, topSectionFrame.Height - 20),
+            new Rectangle(topSectionFrame.X + 10, topSectionFrame.Y + 10, topSectionFrame.Width - 20,
+                topSectionFrame.Height - 20),
             Color.Gray);
 
         DrawNumber(spriteBatch, topSectionManager.ElapsedSeconds, topSectionFrame.X + 16, topSectionFrame.Y + 16);
-        DrawNumber(spriteBatch, topSectionManager.LeftFlags, topSectionFrame.Width - 16 - TEXTURE_COORDS_NUMBER_WIDTH * 3, topSectionFrame.Y + 16);
+        DrawNumber(spriteBatch, topSectionManager.LeftFlags,
+            topSectionFrame.Width - 16 - TEXTURE_COORDS_NUMBER_WIDTH * 3, topSectionFrame.Y + 16);
+        
+        gameStateManager.GetSpriteByGameState(game.GameState).Draw(spriteBatch, spriteSheet, gameStateManager.Position);
 
-        foreach (TileManager tile in gridManager.Grid)
+        foreach (GridTile tile in gridManager.Grid)
         {
-            tile.GetSpriteByIndex(tile.Index).Draw(spriteBatch, tile.Position);
+            gridManager.GetTileSpriteByIndex(tile, tile.Index).Draw(spriteBatch, spriteSheet, tile.Position);
         }
     }
 

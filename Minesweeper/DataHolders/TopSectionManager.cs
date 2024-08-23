@@ -67,18 +67,15 @@ public class TopSectionManager
     
     private void OnClickEvent(object sender, EventArgs e)
     {
-        TileManager tile = (TileManager) sender;
+        GridTile tile = (GridTile) sender;
         OnClickEventArgs clickEventArgs = (OnClickEventArgs) e;
-        if (clickEventArgs.Button == Mouse.GetState().LeftButton)
+        if (clickEventArgs.Button == MouseButtons.Left)
         {
             if(gridManager.revealedBombs)
                 return;
             
             if (!tile.Flagged)
                 timer.setPaused(false);
-
-            if (tile.IsBomb())
-                timer.setPaused(true);
         }
     }
     

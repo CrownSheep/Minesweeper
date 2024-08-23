@@ -12,8 +12,8 @@ public static class KeyboardInputManager
     {
         KeyboardState = Keyboard.GetState();
 
-        bool isKeyPressed = KeyboardState.IsKeyDown(key);
-        bool wasKeyPressed = previousKeyboardState.IsKeyDown(key);
+        bool isKeyPressed = KeyboardState[key] == KeyState.Down;
+        bool wasKeyPressed = previousKeyboardState[key] == KeyState.Down;
 
         previousKeyboardState = KeyboardState;
         
