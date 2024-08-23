@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.System;
 
@@ -13,40 +14,42 @@ public abstract class Clickable
     protected Rectangle Bounds => new Rectangle((Position * game.ZoomFactor).ToPoint(),
         new Point((int) (Width * game.ZoomFactor), (int) (Height * game.ZoomFactor)));
 
-    private MouseState previousMouseState;
+    protected readonly Game1 game;
+    
+    private readonly MouseButtons[] instantButtons;
 
-    protected Game1 game;
-
-    protected Clickable(Game1 game, Vector2 position, int width, int height)
+    protected Clickable(Game1 game, Vector2 position, int width, int height, params MouseButtons[] instantButtons)
     {
         this.game = game;
         Position = position;
         Width = width;
         Height = height;
+        this.instantButtons = instantButtons;
     }
 
 
     public virtual void Update(GameTime gameTime)
     {
-        MouseState mouseState = Mouse.GetState();
-
-        if (game.IsActive)
-        {
-            if (MouseInputManager.Hover(Bounds))
-            {
-                if(MouseInputManager.IsLeftClicked(true))
-                    OnLeftMouseClick();
-                if (MouseInputManager.IsRightClicked(false))
-                    OnRightMouseClick();
-                // if (MouseInputManager.IsMiddleClicked(false))
-                //     OnMiddleMouseClick();
-            }
-        }
-
-        previousMouseState = mouseState;
+        if (!game.IsActive) return;
+        
+        if (!MouseInputManager.Hover(Bounds)) return;
+        
+        if(CheckClick(MouseButtons.Left))
+            OnLeftMouseClick();
+        if (CheckClick(MouseButtons.Right))
+            OnRightMouseClick();
+        if (CheckClick(MouseButtons.Middle))
+            OnMiddleMouseClick();
     }
 
-    protected bool canInteract()
+    private bool CheckClick(MouseButtons button)
+    {
+        return instantButtons.Contains(button)
+            ? MouseInputManager.WasClicked(button)
+            : MouseInputManager.WasReleased(button);
+    }
+
+    protected bool CanInteract()
     {
         return game.IsActive && MouseInputManager.Hover(Bounds);
     }

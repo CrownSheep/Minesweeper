@@ -20,8 +20,8 @@ public class Game1 : Game
 
     private const string SPRITESHEET_ASSET_NAME = "minesweeper_spritesheet";
 
-    public const int DISPLAY_ZOOM_FACTOR = 3;
-    public const int DEFAULT_ZOOM_FACTOR = 2;
+    private const int DISPLAY_ZOOM_FACTOR = 3;
+    private const int DEFAULT_ZOOM_FACTOR = 2;
 
     public int WindowWidth => Config.width * 18 + 20;
     public int WindowHeight => 56 + Config.height * 18 + 10;
@@ -34,7 +34,7 @@ public class Game1 : Game
     private Matrix transformMatrix = Matrix.Identity * Matrix.CreateScale(DEFAULT_ZOOM_FACTOR, DEFAULT_ZOOM_FACTOR, 1);
     
     private GameManager gameManager;
-    public GameConfig DefaultConfig => GameConfig.BEGINNER;
+    GameConfig DefaultConfig => GameConfig.BEGINNER;
     public GameConfig Config { get; private set; }
     public GameState GameState { get; set; }
     public DisplayMode WindowDisplayMode { get; set; } = DisplayMode.Default;
@@ -73,20 +73,19 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
-
-        if (KeyboardInputManager.WasJustPressed(Keys.F12))
+        
+        MouseInputManager.Update();
+        KeyboardInputManager.Update();
+        
+        if (KeyboardInputManager.WasKeyDown(Keys.F12))
         {
             ToggleDisplayMode();
         }
-        
-        MouseInputManager.Update();
         
         gameManager.Update(gameTime);
 
         base.Update(gameTime);
     }
-    
-    
 
     protected override void Draw(GameTime gameTime)
     {
@@ -129,7 +128,7 @@ public class Game1 : Game
             WindowDisplayMode = DisplayMode.Default;
             graphics.PreferredBackBufferWidth = WindowWidth * DEFAULT_ZOOM_FACTOR;
             graphics.PreferredBackBufferHeight = WindowHeight * DEFAULT_ZOOM_FACTOR;
-            transformMatrix =Matrix.Identity * Matrix.CreateScale(DEFAULT_ZOOM_FACTOR, DEFAULT_ZOOM_FACTOR, 1);
+            transformMatrix = Matrix.Identity * Matrix.CreateScale(DEFAULT_ZOOM_FACTOR, DEFAULT_ZOOM_FACTOR, 1);
         }
             
         graphics.ApplyChanges();

@@ -5,10 +5,6 @@ namespace Minesweeper.System;
 
 public static class MouseInputManager
 {
-    private static bool LeftActualClicked;
-    private static bool RightActualClicked;
-    private static bool MiddleActualClicked;
-
     private static MouseState mouseState, oldMouseState;
 
     public static void Update()
@@ -17,60 +13,36 @@ public static class MouseInputManager
         mouseState = Mouse.GetState();
     }
 
-    public static bool IsLeftClicked(bool checkHold)
-    {        
-        if (checkHold)
-        {
-            if (mouseState.LeftButton != ButtonState.Pressed && oldMouseState.LeftButton == ButtonState.Pressed)
-            {
-                LeftActualClicked = true;
-            }
-
-            if (LeftActualClicked && mouseState.LeftButton == ButtonState.Released)
-            {
-                LeftActualClicked = false;
-                return true;
-            }
-        }
-        else
-        {
-            return mouseState.RightButton == ButtonState.Pressed && oldMouseState.RightButton != ButtonState.Pressed;
-        }
-
-        return false;
-    }
-    
-    public static bool IsLeftHold()
-    {        
-        return mouseState.LeftButton == ButtonState.Pressed;
-    }
-    
-    public static bool IsRightHold()
-    {        
-        return mouseState.RightButton == ButtonState.Pressed;
-    }
-    
-    public static bool IsRightClicked(bool checkHold)
+    private static ButtonState GetButtonState(MouseButtons button, bool old = false)
     {
-        if (checkHold)
+        return button switch
         {
-            if (mouseState.RightButton != ButtonState.Pressed && oldMouseState.RightButton == ButtonState.Pressed)
-            {
-                RightActualClicked = true;
-            }
+            MouseButtons.Left => old ? oldMouseState.LeftButton : mouseState.LeftButton,
+            MouseButtons.Right => old ? oldMouseState.RightButton : mouseState.RightButton,
+            MouseButtons.Middle => old ? oldMouseState.MiddleButton : mouseState.MiddleButton,
+            _ => old ? oldMouseState.LeftButton : mouseState.LeftButton
+        };
+    }
 
-            if (RightActualClicked && mouseState.RightButton == ButtonState.Released)
-            {
-                RightActualClicked = false;
-                return true;
-            }
-        }
-        else
-        {
-            return mouseState.RightButton == ButtonState.Pressed && oldMouseState.RightButton != ButtonState.Pressed;
-        }
+    public static bool WasReleased(MouseButtons button)
+    {
+        ButtonState buttonState = GetButtonState(button);
+        ButtonState oldButtonState = GetButtonState(button, true);
 
-        return false;
+        return buttonState == ButtonState.Released && oldButtonState == ButtonState.Pressed;
+    }
+
+    public static bool WasClicked(MouseButtons button)
+    {
+        ButtonState buttonState = GetButtonState(button);
+        ButtonState oldButtonState = GetButtonState(button, true);
+        
+        return buttonState == ButtonState.Pressed && oldButtonState == ButtonState.Released;
+    }
+    
+    public static bool IsCurrentlyPressed(MouseButtons button)
+    {        
+        return GetButtonState(button) == ButtonState.Pressed;
     }
     
     public static bool Hover(Rectangle r)

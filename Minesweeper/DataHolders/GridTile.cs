@@ -24,7 +24,7 @@ public class GridTile : Clickable
     public Vector2 gridPosition;
 
     public GridTile(Game1 game, Vector2 position, int width, int height, int xIndex, int yIndex) : base(game, position,
-        width, height)
+        width, height, MouseButtons.Right)
     {
         this.xIndex = xIndex;
         this.yIndex = yIndex;
@@ -60,8 +60,9 @@ public class GridTile : Clickable
             }
             else
             {
-                if(!MouseInputManager.IsLeftHold())
+                if(MouseInputManager.WasReleased(MouseButtons.Left))
                     game.GameState = GameState.Playing;
+                
                 ShowHeld = false;
             }
         }
