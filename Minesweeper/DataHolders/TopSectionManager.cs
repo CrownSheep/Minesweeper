@@ -71,7 +71,7 @@ public class TopSectionManager
         OnClickEventArgs clickEventArgs = (OnClickEventArgs) e;
         if (clickEventArgs.Button == MouseButtons.Left)
         {
-            if(gridManager.revealedBombs)
+            if(gridManager.RevealedBombs)
                 return;
             
             if (!tile.Flagged)

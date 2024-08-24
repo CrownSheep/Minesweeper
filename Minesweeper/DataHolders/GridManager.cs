@@ -15,23 +15,23 @@ public class GridManager
     public const int BOMB_INDEX = -1;
     public const int EMPTY_INDEX = 0;
     
-    private TileSprite HiddenSprite => new(0);
-    private TileSprite EmptySprite => new(1);
-    private TileSprite FlagSprite => new(2);
-    private TileSprite BombSprite => new(5);
-    private TileSprite ClickedBombSprite => new(6);
-    private TileSprite BadFlagSprite => new(7);
+    private readonly TileSprite hiddenSprite = new(0);
+    private readonly TileSprite emptySprite = new(1);
+    private readonly TileSprite flagSprite = new(2);
+    private readonly TileSprite bombSprite = new(5);
+    private readonly TileSprite clickedBombSprite = new(6);
+    private readonly TileSprite badFlagSprite = new(7);
 
     public GridTile[,] Grid { get; private set; }
 
     private bool initialTile = true;
 
-    private Random random;
+    private readonly Random random;
 
-    private List<GridTile> bombTiles = new List<GridTile>();
-    private List<GridTile> flagTiles = new List<GridTile>();
+    private readonly List<GridTile> bombTiles = new List<GridTile>();
+    private readonly List<GridTile> flagTiles = new List<GridTile>();
 
-    public bool revealedBombs;
+    public bool RevealedBombs;
     public event EventHandler ClickEvent;
     public event EventHandler WinEvent;
     public event EventHandler LoseEvent;
@@ -72,7 +72,7 @@ public class GridManager
     public void ResetBoard()
     {
         initialTile = true;
-        revealedBombs = false;
+        RevealedBombs = false;
         bombTiles.Clear();
         flagTiles.Clear();
         foreach (GridTile tile in Grid)
@@ -166,7 +166,7 @@ public class GridManager
         if (button == MouseButtons.Left)
         {
             OnClickEvent(clickedTile, button);
-            if (!revealedBombs && !clickedTile.Flagged)
+            if (!RevealedBombs && !clickedTile.Flagged)
             {
                 if (initialTile)
                 {
@@ -192,14 +192,14 @@ public class GridManager
                     OnLoseEvent();
                     game.GameState = GameState.Lose;
                     RevealAllBombs(clickedTile);
-                    revealedBombs = true;
+                    RevealedBombs = true;
                 }
             }
         }
 
         if (button == MouseButtons.Right)
         {
-            if (clickedTile.IsHidden() && !revealedBombs)
+            if (clickedTile.IsHidden() && !RevealedBombs)
                 clickedTile.Flag();
         }
     }
@@ -309,29 +309,29 @@ public class GridManager
         if (tile.Hidden)
         {
             if (tile.ShowHeld)
-                return EmptySprite;
+                return emptySprite;
             
             if (tile.Flagged)
             {
                 if (!tile.IsBomb() && tile.IsBadFlagged)
                 {
-                    return BadFlagSprite;
+                    return badFlagSprite;
                 }
-                return FlagSprite;
+                return flagSprite;
             }
 
-            return HiddenSprite;
+            return hiddenSprite;
         }
 
         if (tile.ClickedBomb)
-            return ClickedBombSprite;
+            return clickedBombSprite;
         
         switch (index)
         {
             case <= BOMB_INDEX:
-                return BombSprite;
+                return bombSprite;
             case 0:
-                return EmptySprite;
+                return emptySprite;
         }
         return new TileSprite(0 + MathHelper.Clamp(index - 1, 0, 7), TILE_HEIGHT);
     }

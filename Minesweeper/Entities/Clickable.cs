@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.System;
+using Minesweeper.System.Input.Mouse;
 
 namespace Minesweeper.Entities;
 

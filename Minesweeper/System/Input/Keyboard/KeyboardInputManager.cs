@@ -1,8 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.Xna.Framework.Input;
 
-namespace Minesweeper.System;
+namespace Minesweeper.System.Input.Keyboard;
 
 public static class KeyboardInputManager
 {
@@ -11,7 +10,7 @@ public static class KeyboardInputManager
     public static void Update()
     {
         previousKeyboardState = KeyboardState;
-        KeyboardState = Keyboard.GetState();
+        KeyboardState = Microsoft.Xna.Framework.Input.Keyboard.GetState();
     }
     
     public static bool WasKeyDown(Keys key)
@@ -25,6 +24,16 @@ public static class KeyboardInputManager
     public static bool IsKeyDown(Keys key)
     {
         return KeyboardState.IsKeyDown(key);
+    }
+    
+    public static bool AreKeysDown(MultiKey key)
+    {
+        return key.Keys.All(IsKeyDown);
+    }
+
+    public static bool WereKeysDown(MultiKey key)
+    {
+        return key.Keys.All(key => !previousKeyboardState.IsKeyDown(key) && IsKeyDown(key));
     }
     
     public static bool AreKeysDown(params Keys[] keys)

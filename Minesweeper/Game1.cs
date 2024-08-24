@@ -5,6 +5,8 @@ using Microsoft.Xna.Framework.Input;
 using Minesweeper.DataHolders;
 using Minesweeper.Entities;
 using Minesweeper.System;
+using Minesweeper.System.Input.Keyboard;
+using Minesweeper.System.Input.Mouse;
 
 namespace Minesweeper;
 
@@ -80,6 +82,11 @@ public class Game1 : Game
         if (KeyboardInputManager.WasKeyDown(Keys.F12))
         {
             ToggleDisplayMode();
+        }
+        
+        if (MouseInputManager.GetScrollWheelValue() != MouseInputManager.GetOldScrollWheelValue())
+        {
+            Console.WriteLine(MouseInputManager.GetScrolledValue());
         }
         
         gameManager.Update(gameTime);

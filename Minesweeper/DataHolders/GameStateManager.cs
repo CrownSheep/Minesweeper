@@ -1,7 +1,9 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Minesweeper.Entities;
 using Minesweeper.System;
+using Minesweeper.System.Input.Mouse;
 
 namespace Minesweeper.DataHolders;
 
@@ -33,7 +35,7 @@ public class GameStateManager : Clickable
 
     public GameStateSprite GetSpriteByGameState(GameState state)
     {
-        if (CanInteract() && MouseInputManager.IsCurrentlyPressed(MouseButtons.Left))
+        if (CanInteract() && MouseInputManager.IsCurrently(ButtonState.Pressed, MouseButtons.Left))
         {
             return HeldPlayingSprite;
         }
