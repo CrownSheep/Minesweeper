@@ -61,7 +61,7 @@ public class GridTile : Clickable
             }
             else
             {
-                if(MouseInputManager.WasReleased(MouseButtons.Left))
+                if(MouseManager.WasReleased(MouseButtons.Left))
                     game.GameState = GameState.Playing;
                 
                 ShowHeld = false;

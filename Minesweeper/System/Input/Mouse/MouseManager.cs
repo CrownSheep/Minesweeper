@@ -1,9 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Minesweeper.System.Input.Mouse;
 
-public static class MouseInputManager
+public static class MouseManager
 {
     private static MouseState mouseState, oldMouseState;
 
@@ -38,6 +39,27 @@ public static class MouseInputManager
     {
         return GetScrollWheelValue() - GetOldScrollWheelValue();
     }
+    
+    public static ScrollDirection? GetCurrentScrollDirection()
+    {
+        return Math.Sign(GetScrolledValue()) switch
+        {
+            1 => ScrollDirection.Up,
+            -1 => ScrollDirection.Down,
+            0 => null
+        };
+    }
+    
+    public static bool JustScrolledInDirection(ScrollDirection direction = ScrollDirection.Both)
+    {
+        return direction switch
+        {
+            ScrollDirection.Both => GetScrollWheelValue() != GetOldScrollWheelValue(),
+            ScrollDirection.Up => GetScrollWheelValue() > GetOldScrollWheelValue(),
+            ScrollDirection.Down => GetScrollWheelValue() < GetOldScrollWheelValue(),
+            _ => GetScrollWheelValue() != GetOldScrollWheelValue()
+        };
+    }
 
     public static bool WasReleased(MouseButtons button)
     {
@@ -60,8 +82,8 @@ public static class MouseInputManager
         return GetButtonState(button) == buttonState;
     }
     
-    public static bool Hover(Rectangle r)
+    public static bool Hover(Rectangle bounds)
     {
-        return r.Contains(new Vector2(mouseState.X, mouseState.Y));
+        return bounds.Contains(new Vector2(mouseState.X, mouseState.Y));
     }
 }

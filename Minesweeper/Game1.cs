@@ -76,17 +76,12 @@ public class Game1 : Game
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
         
-        MouseInputManager.Update();
-        KeyboardInputManager.Update();
+        MouseManager.Update();
+        KeyboardManager.Update();
         
-        if (KeyboardInputManager.WasKeyDown(Keys.F12))
+        if (KeyboardManager.WasKeyDown(Keys.F12))
         {
             ToggleDisplayMode();
-        }
-        
-        if (MouseInputManager.GetScrollWheelValue() != MouseInputManager.GetOldScrollWheelValue())
-        {
-            Console.WriteLine(MouseInputManager.GetScrolledValue());
         }
         
         gameManager.Update(gameTime);

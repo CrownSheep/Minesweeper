@@ -33,7 +33,7 @@ public abstract class Clickable
     {
         if (!game.IsActive) return;
         
-        if (!MouseInputManager.Hover(Bounds)) return;
+        if (!MouseManager.Hover(Bounds)) return;
         
         if(CheckClick(MouseButtons.Left))
             OnLeftMouseClick();
@@ -46,13 +46,13 @@ public abstract class Clickable
     private bool CheckClick(MouseButtons button)
     {
         return instantButtons.Contains(button)
-            ? MouseInputManager.WasClicked(button)
-            : MouseInputManager.WasReleased(button);
+            ? MouseManager.WasClicked(button)
+            : MouseManager.WasReleased(button);
     }
 
     protected bool CanInteract()
     {
-        return game.IsActive && MouseInputManager.Hover(Bounds);
+        return game.IsActive && MouseManager.Hover(Bounds);
     }
 
     protected virtual void OnLeftMouseClick()
