@@ -87,13 +87,15 @@ public class GridManager
     
     public void SetBombs(GridTile safeTile, int bombCount)
     {
+        int tileCount = Grid.GetLength(0) + Grid.GetLength(1);
         int bombsPlaced = 0;
-        while (bombsPlaced < bombCount)
+        while (bombsPlaced < Math.Clamp(bombCount, 0, tileCount - 1))
         {
             int randX = random.Next(Config.width);
             int randY = random.Next(Config.height);
             GridTile randTile = Grid[randX, randY];
-            if (!randTile.IsBomb() && !randTile.gridPosition.IsWithinAdjacentZone(safeTile.gridPosition))
+            
+            if (!randTile.IsBomb() && !randTile.gridPosition.IsWithinAdjacentZone(safeTile.gridPosition, tileCount > 9 ? 1 : 0))
             {
                 randTile.SetIndex(BOMB_INDEX);
                 bombsPlaced++;
@@ -102,22 +104,6 @@ public class GridManager
         }
 
         initialTile = false;
-    }
-
-    private static bool InZone(Vector2 position, Vector2 safePosition)
-    {
-        for (int x = -1; x <= 1; x++)
-        {
-            for (int y = -1; y <= 1; y++)
-            {
-                if (position == new Vector2(safePosition.X + x, safePosition.Y + y))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     protected virtual void OnClickEvent(GridTile tile, MouseButtons button)
