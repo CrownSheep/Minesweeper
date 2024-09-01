@@ -44,6 +44,7 @@ public class Particle
         Color = particle.Color;
         Size = particle.Size;
         Rotation = particle.Rotation;
+        Sprite = particle.Sprite;
     }
 
     public virtual void Update(GameTime gameTime)

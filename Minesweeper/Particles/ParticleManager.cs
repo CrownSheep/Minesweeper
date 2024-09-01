@@ -26,19 +26,18 @@ public static class ParticleManager
 
         for (int i = 0; i < numberOfParticles; i++)
         {
-            // Calculate the angle for this particle
             float angle = MathHelper.TwoPi * i / numberOfParticles;
 
-            // Calculate the direction for the particle to move in
             Vector2 direction = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
 
-            // Calculate the initial position of the particle on the circle's edge
             Vector2 particlePosition = center + direction * radius;
 
-            // Calculate the velocity by scaling the direction with the speed
             Vector2 velocity = direction * speed;
 
-            var newParticle = particle is PhysicsParticle ? new PhysicsParticle(velocity) : new Particle(particle);
+            var newParticle = particle is PhysicsParticle ? new PhysicsParticle(velocity)
+            {
+                Sprite = particle.Sprite,
+            } : new Particle(particle);
 
             SpawnParticle(newParticle, particlePosition);
         }

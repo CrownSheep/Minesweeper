@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.Entities;
@@ -37,8 +38,7 @@ public class GameStateManager : Clickable
         ParticleManager.SpawnInCircle(new PhysicsParticle
         {
             Sprite = new Sprite(Globals.TransparentSpriteSheet, 4, 27, 17, 17),
-            Gravity = 56
-        }, new Rectangle((int)Position.X, (int)Position.Y, Width, Height).GetCenter(), 0);
+        }, new Vector2(Position.X + Width / 4 - 0.3f, Position.Y + Height / 4), 0);
     }
 
     public GameStateSprite GetSpriteByGameState(GameState state)
