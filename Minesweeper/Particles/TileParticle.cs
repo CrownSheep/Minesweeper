@@ -5,6 +5,7 @@ namespace Minesweeper.Particles;
 
 class TileParticle : PhysicsParticle
 {
+
     public TileParticle(GridTile tile, bool useTransparent = true, float lifespan = 2.5f)
     {
         Position = tile.Position;
@@ -33,4 +34,5 @@ class TileParticle : PhysicsParticle
         if (useTransparent)
             SpriteSheet = Globals.TransparentSpriteSheet;
     }
+
 }

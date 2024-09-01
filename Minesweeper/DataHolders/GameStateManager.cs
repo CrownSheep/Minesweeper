@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.Entities;
+using Minesweeper.Extensions;
 using Minesweeper.Graphics;
 using Minesweeper.Particles;
 using Minesweeper.System;
@@ -37,7 +38,7 @@ public class GameStateManager : Clickable
         {
             Sprite = new Sprite(Globals.TransparentSpriteSheet, 4, 27, 17, 17),
             Gravity = 56
-        }, Position + new Vector2(Width / 4, Height / 4), 0);
+        }, new Rectangle((int)Position.X, (int)Position.Y, Width, Height).GetCenter(), 0);
     }
 
     public GameStateSprite GetSpriteByGameState(GameState state)

@@ -19,7 +19,8 @@ public static class ParticleManager
         particles.Add(particle);
     }
 
-    public static void SpawnInCircle(Particle particle, Vector2 position, float radius, int numberOfParticles = 5, float speed = 100f)
+    public static void SpawnInCircle(Particle particle, Vector2 position, float radius, int numberOfParticles = 5,
+        float speed = 100f)
     {
         Vector2 center = new Vector2(position.X, position.Y);
 
@@ -37,29 +38,8 @@ public static class ParticleManager
             // Calculate the velocity by scaling the direction with the speed
             Vector2 velocity = direction * speed;
 
-            // Create a new particle instance for each loop iteration
-            Particle newParticle;
-            if (particle is PhysicsParticle physicsParticle)
-            {
-                // Clone the physics particle and set its velocity
-                newParticle = new PhysicsParticle
-                {
-                    Sprite = physicsParticle.Sprite,
-                    Position = particlePosition,
-                    Velocity = velocity
-                };
-            }
-            else
-            {
-                // Clone the non-physics particle
-                newParticle = new Particle
-                {
-                    Sprite = particle.Sprite,
-                    Position = particlePosition
-                };
-            }
+            var newParticle = particle is PhysicsParticle ? new PhysicsParticle(velocity) : new Particle(particle);
 
-            // Spawn the new particle
             SpawnParticle(newParticle, particlePosition);
         }
     }
@@ -83,9 +63,13 @@ public static class ParticleManager
         foreach (var particle in particles)
         {
             float size = particle.CurrentLife / particle.Lifespan;
+            
             spriteBatch.Draw(particle.SpriteSheet, particle.Position,
-                new Rectangle(particle.Sprite.x, particle.Sprite.y, particle.Sprite.width, particle.Sprite.height), particle.Color,
-                particle.Rotation, new Vector2(0.5f * particle.Size * size, 0.5f * particle.Size * size), particle.Size * size, SpriteEffects.None,
+                particle.Sprite != null
+                    ? new Rectangle(particle.Sprite.x, particle.Sprite.y, particle.Sprite.width,
+                        particle.Sprite.height) : null, particle.Color,
+                particle.Rotation, new Vector2(0.5f * particle.Size * size, 0.5f * particle.Size * size),
+                particle.Size * size, SpriteEffects.None,
                 0f);
         }
     }
