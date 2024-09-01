@@ -7,14 +7,14 @@ namespace Minesweeper;
 public class OnClickEventArgs : EventArgs
 {
     private readonly MouseButtons button;
+    private readonly bool userClick;
 
-    public OnClickEventArgs(MouseButtons button)
+    public OnClickEventArgs(MouseButtons button, bool userClick = true)
     {
         this.button = button;
+        this.userClick = userClick;
     }
     
-    public MouseButtons Button
-    {
-        get { return button; }
-    }
+    public MouseButtons Button => button;
+    public bool UserClick => userClick;
 }

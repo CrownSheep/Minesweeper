@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.DataHolders;
 using Minesweeper.Extensions;
-using Minesweeper.System;
+using Minesweeper.System.Input.Keyboard;
 
 namespace Minesweeper.Entities;
 
@@ -66,6 +66,12 @@ public class GameManager
         {
             tile.Update(gameTime);
         }
+        gridManager.timer.Tick(gameTime);
+
+        if (KeyboardManager.WasKeyDown(Keys.W))
+        {
+            gridManager.Win();
+        }
     }
 
     public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
@@ -89,7 +95,7 @@ public class GameManager
 
         foreach (GridTile tile in gridManager.Grid)
         {
-            gridManager.GetTileSpriteByIndex(tile, tile.Index).Draw(spriteBatch, spriteSheet, tile.Position);
+            GridTile.GetSpriteByTile(tile).Draw(spriteBatch, tile.Position);
         }
     }
 

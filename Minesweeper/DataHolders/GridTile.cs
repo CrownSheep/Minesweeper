@@ -9,7 +9,19 @@ namespace Minesweeper.DataHolders;
 
 public class GridTile : Clickable
 {
-    public int Index { get; private set; }
+    public const int TILE_WIDTH = 18;
+    public const int TILE_HEIGHT = 18;
+
+    public const int BOMB_INDEX = -1;
+    public const int EMPTY_INDEX = 0;
+    
+    private static readonly TileSprite hiddenSprite = new(Globals.MainSpriteSheet, 0);
+    private static readonly TileSprite emptySprite = new(Globals.MainSpriteSheet, 1);
+    private static readonly TileSprite flagSprite = new(Globals.MainSpriteSheet, 2);
+    private static readonly TileSprite bombSprite = new(Globals.MainSpriteSheet, 5);
+    private static readonly TileSprite clickedBombSprite = new(Globals.MainSpriteSheet, 6);
+    private static readonly TileSprite badFlagSprite = new(Globals.MainSpriteSheet, 7);
+    public int Index { get; set; }
     public bool Hidden { get; set; }
     public bool ShowHeld { get; set; }
     public bool Flagged { get; set; }
@@ -38,7 +50,7 @@ public class GridTile : Clickable
 
     public void SetIndex(int index)
     {
-        Index = MathHelper.Clamp(index, GridManager.BOMB_INDEX, 8);
+        Index = MathHelper.Clamp(index, BOMB_INDEX, 8);
     }
 
     public bool IsHidden()
@@ -74,8 +86,10 @@ public class GridTile : Clickable
 
     protected override void OnLeftMouseClick()
     {
-        if(game.GameState != GameState.Lose && game.GameState != GameState.Win)
+        if (game.GameState != GameState.Lose && game.GameState != GameState.Win)
+        {
             OnClickEvent(MouseButtons.Left);
+        }
     }
     
     protected override void OnRightMouseClick()
@@ -123,11 +137,79 @@ public class GridTile : Clickable
 
     public bool IsBomb()
     {
-        return Index == GridManager.BOMB_INDEX;
+        return Index == BOMB_INDEX;
     }
     
     public bool IsEmpty()
     {
-        return Index == GridManager.EMPTY_INDEX;
+        return Index == EMPTY_INDEX;
+    }
+    
+    public static TileSprite GetSpriteByTile(GridTile tile)
+    {
+        if (tile.Hidden)
+        {
+            if (tile.ShowHeld)
+                return emptySprite;
+
+            if (tile.Flagged)
+            {
+                if (!tile.IsBomb() && tile.IsBadFlagged)
+                {
+                    return badFlagSprite;
+                }
+
+                return flagSprite;
+            }
+
+            return hiddenSprite;
+        }
+
+        if (tile.ClickedBomb)
+            return clickedBombSprite;
+
+        switch (tile.Index)
+        {
+            case <= BOMB_INDEX:
+                return bombSprite;
+            case 0:
+                return emptySprite;
+        }
+
+        return new TileSprite(Globals.MainSpriteSheet, 0 + MathHelper.Clamp(tile.Index - 1, 0, 7), TILE_HEIGHT);
+    }
+    
+    public static TileSprite GetSpriteByTileData(int index, bool hidden = false, bool flagged = false, bool clickedBomb = false, bool badFlagged = false, bool showHeld = false)
+    {
+        if (hidden)
+        {
+            if (showHeld)
+                return emptySprite;
+
+            if (flagged)
+            {
+                if (index != BOMB_INDEX && badFlagged)
+                {
+                    return badFlagSprite;
+                }
+
+                return flagSprite;
+            }
+
+            return hiddenSprite;
+        }
+
+        if (clickedBomb)
+            return clickedBombSprite;
+
+        switch (index)
+        {
+            case <= BOMB_INDEX:
+                return bombSprite;
+            case 0:
+                return emptySprite;
+        }
+
+        return new TileSprite(Globals.MainSpriteSheet, 0 + MathHelper.Clamp(index - 1, 0, 7), TILE_HEIGHT);
     }
 }

@@ -9,8 +9,7 @@ public static class SpriteBatchExt
 {
     public static void DrawRectangle(this SpriteBatch spriteBatch, Rectangle rectangle, Color color)
     {
-        if (spriteBatch is null)
-            throw new ArgumentNullException(nameof(spriteBatch));
+        ExtensionUtils.ThrowNullError(ref spriteBatch);
 
         Texture2D texture = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
         texture.SetData(new []{color});
@@ -19,8 +18,7 @@ public static class SpriteBatchExt
     }
     
     public static void DrawBorder(this SpriteBatch spriteBatch, Rectangle rectangle, Color color, int lineWidth) {
-        if (spriteBatch is null)
-            throw new ArgumentNullException(nameof(spriteBatch));
+        ExtensionUtils.ThrowNullError(ref spriteBatch);
         
         Texture2D texture = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
         texture.SetData(new []{Color.White});

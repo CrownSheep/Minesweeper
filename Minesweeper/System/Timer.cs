@@ -30,6 +30,11 @@ public class Timer
         this.paused = paused;
     }
     
+    public bool Finished()
+    {
+        return remainingTime is <= 0 and > -1;
+    }
+    
     public void End()
     {
         remainingTime = 0;

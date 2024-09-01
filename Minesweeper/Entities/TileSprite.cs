@@ -1,18 +1,19 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Minesweeper.DataHolders;
+using Minesweeper.Graphics;
 
 namespace Minesweeper.Entities;
 
-public record TileSprite(int spriteIndex)
+public class TileSprite : Sprite
 {
     private readonly int yOffset;
-    public TileSprite(int spriteIndex, int yOffset) : this(spriteIndex)
+    private readonly int spriteIndex;
+
+    public TileSprite(Texture2D spriteSheet, int spriteIndex, int yOffset = 0) : base(spriteSheet, spriteIndex * GridTile.TILE_WIDTH,
+        47 + yOffset, GridTile.TILE_WIDTH, GridTile.TILE_HEIGHT)
     {
+        this.spriteIndex = spriteIndex;
         this.yOffset = yOffset;
-    }
-    public void Draw(SpriteBatch spriteBatch, Texture2D spriteSheet ,Vector2 position)
-    {
-        spriteBatch.Draw(spriteSheet, position, new Rectangle(spriteIndex * GridManager.TILE_WIDTH, 47 + yOffset, GridManager.TILE_WIDTH, GridManager.TILE_HEIGHT), Color.White);
     }
 }

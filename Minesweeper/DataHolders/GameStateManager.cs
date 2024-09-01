@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.Entities;
+using Minesweeper.Graphics;
+using Minesweeper.Particles;
 using Minesweeper.System;
 using Minesweeper.System.Input.Mouse;
 
@@ -31,6 +33,11 @@ public class GameStateManager : Clickable
         game.LoadGameWithConfig(game.Config);
         game.GameState = GameState.Playing;
         restartAction.Invoke();
+        ParticleManager.SpawnInCircle(new PhysicsParticle
+        {
+            Sprite = new Sprite(Globals.TransparentSpriteSheet, 4, 27, 17, 17),
+            Gravity = 56
+        }, Position + new Vector2(Width / 4, Height / 4), 0);
     }
 
     public GameStateSprite GetSpriteByGameState(GameState state)

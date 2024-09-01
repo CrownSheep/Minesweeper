@@ -1,27 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
-using Minesweeper.Entities;
 using Minesweeper.Extensions;
+using Minesweeper.Graphics;
+using Minesweeper.Particles;
 using Minesweeper.System;
 
 namespace Minesweeper.DataHolders;
 
 public class GridManager
 {
-    public const int TILE_WIDTH = 18;
-    public const int TILE_HEIGHT = 18;
-    
-    public const int BOMB_INDEX = -1;
-    public const int EMPTY_INDEX = 0;
-    
-    private readonly TileSprite hiddenSprite = new(0);
-    private readonly TileSprite emptySprite = new(1);
-    private readonly TileSprite flagSprite = new(2);
-    private readonly TileSprite bombSprite = new(5);
-    private readonly TileSprite clickedBombSprite = new(6);
-    private readonly TileSprite badFlagSprite = new(7);
-
+    public readonly Timer timer = new Timer(0.5f, true);
     public GridTile[,] Grid { get; private set; }
 
     private bool initialTile = true;
@@ -49,6 +39,21 @@ public class GridManager
         this.game = game;
         random = new Random();
         Position = position;
+        timer.FinishEvent += OnTimer;
+    }
+
+    private void OnTimer(object sender, EventArgs e)
+    {
+        if (Won())
+        {
+            GridTile[] aboveZ = Grid.Cast<GridTile>().Where(tile => tile.Index > 0).ToArray();
+            if (aboveZ.Length > 0)
+            {
+                GridTile tile = aboveZ[random.Next(0, aboveZ.Length)];
+                ParticleManager.SpawnParticle(new TileParticle(tile), tile.Position);
+                tile.Index = GridTile.EMPTY_INDEX;
+            }
+        }
     }
 
     public void Initialize(GameConfig config)
@@ -60,8 +65,8 @@ public class GridManager
             for (int j = 0; j < Grid.GetLength(1); j++)
             {
                 Grid[i, j] = new GridTile(game,
-                    new Vector2(Position.X + i * TILE_WIDTH, Position.Y + j * TILE_HEIGHT),
-                    TILE_WIDTH, TILE_HEIGHT, i, j);
+                    new Vector2(Position.X + i * GridTile.TILE_WIDTH, Position.Y + j * GridTile.TILE_HEIGHT),
+                    GridTile.TILE_WIDTH, GridTile.TILE_HEIGHT, i, j);
                 Grid[i, j].ClickEvent += OnClickTile;
                 Grid[i, j].RevealEvent += OnRevealTile;
                 Grid[i, j].FlagEvent += OnFlagTile;
@@ -84,7 +89,7 @@ public class GridManager
             tile.Hidden = true;
         }
     }
-    
+
     public void SetBombs(GridTile safeTile, int bombCount)
     {
         int tileCount = Grid.GetLength(0) + Grid.GetLength(1);
@@ -94,10 +99,11 @@ public class GridManager
             int randX = random.Next(Config.width);
             int randY = random.Next(Config.height);
             GridTile randTile = Grid[randX, randY];
-            
-            if (!randTile.IsBomb() && !randTile.gridPosition.IsWithinAdjacentZone(safeTile.gridPosition, tileCount > 9 ? 1 : 0))
+
+            if (!randTile.IsBomb() &&
+                !randTile.gridPosition.IsWithinAdjacentZone(safeTile.gridPosition, tileCount > 9 ? 1 : 0))
             {
-                randTile.SetIndex(BOMB_INDEX);
+                randTile.SetIndex(GridTile.BOMB_INDEX);
                 bombsPlaced++;
                 bombTiles.Add(randTile);
             }
@@ -111,13 +117,13 @@ public class GridManager
         EventHandler handler = ClickEvent;
         handler?.Invoke(tile, new OnClickEventArgs(button));
     }
-    
+
     protected virtual void OnWinEvent()
     {
         EventHandler handler = WinEvent;
         handler?.Invoke(this, EventArgs.Empty);
     }
-    
+
     protected virtual void OnLoseEvent()
     {
         EventHandler handler = LoseEvent;
@@ -143,12 +149,26 @@ public class GridManager
         GridTile clickedTile = (GridTile)sender;
         clickedTile.Hidden = false;
     }
+    
+    public void Win()
+    {
+        GridTile[] nonBombTiles = Grid.Cast<GridTile>().Where(tile => !tile.IsBomb()).ToArray();
+        OnClickTile(nonBombTiles[random.Next(nonBombTiles.Length)], new OnClickEventArgs(MouseButtons.Left));
+        foreach (GridTile tile in Grid)
+        {
+            if (tile.IsEmpty())
+            {
+                OnClickTile(tile, new OnClickEventArgs(MouseButtons.Left));
+            }
+        }
+    }
 
     private void OnClickTile(object sender, EventArgs e)
     {
         GridTile clickedTile = (GridTile)sender;
         MouseButtons button = ((OnClickEventArgs)e).Button;
-        
+        bool userClick = ((OnClickEventArgs)e).UserClick;
+
         if (button == MouseButtons.Left)
         {
             OnClickEvent(clickedTile, button);
@@ -157,10 +177,13 @@ public class GridManager
                 if (initialTile)
                 {
                     SetBombs(clickedTile, Config.bombCount);
-                    if(Config.showBombsAtStart)
+                    if (Config.showBombsAtStart)
                         RevealAllBombs(clickedTile);
                 }
-
+                
+                if(clickedTile.Hidden && userClick)
+                    ParticleManager.SpawnParticle(new TileParticle(clickedTile, false, 2f), clickedTile.Position);
+                
                 if (clickedTile.IsEmpty())
                 {
                     clickedTile.Reveal();
@@ -186,11 +209,15 @@ public class GridManager
         if (button == MouseButtons.Right)
         {
             if (clickedTile.IsHidden() && !RevealedBombs)
+            {
+                if(clickedTile.Flagged)
+                    ParticleManager.SpawnParticle(new TileParticle(clickedTile), clickedTile.Position);
                 clickedTile.Flag();
+            }
         }
     }
 
-    private bool Won()
+    public bool Won()
     {
         bool allFound = true;
         foreach (GridTile tile in Grid)
@@ -204,7 +231,6 @@ public class GridManager
 
     private void RevealAllBombs(GridTile clickedTile, bool flagged = false)
     {
-
         if (!flagged)
         {
             if (clickedTile.IsBomb())
@@ -226,9 +252,9 @@ public class GridManager
         {
             foreach (GridTile bombTile in bombTiles)
             {
-                if(!bombTile.Flagged)
+                if (!bombTile.Flagged)
                     flagTiles.Add(bombTile);
-                            
+
                 bombTile.Flagged = true;
                 bombTile.Hidden = true;
             }
@@ -252,9 +278,10 @@ public class GridManager
                     {
                         if (adjacentTile.IsEmpty() && adjacentTile.IsHidden() && !adjacentTile.Flagged)
                         {
+                            ParticleManager.SpawnParticle(new TileParticle(adjacentTile, false, 2f), clickedTile.Position);
                             adjacentTile.SetIndex(AdjacentBombCount(adjacentTile));
                             adjacentTile.Hidden = false;
-                            OnClickTile(adjacentTile, new OnClickEventArgs(button));
+                            OnClickTile(adjacentTile, new OnClickEventArgs(button, false));
                         }
                     }
                 }
@@ -288,37 +315,5 @@ public class GridManager
         }
 
         return bombCount;
-    }
-    
-    public TileSprite GetTileSpriteByIndex(GridTile tile, int index)
-    {
-        if (tile.Hidden)
-        {
-            if (tile.ShowHeld)
-                return emptySprite;
-            
-            if (tile.Flagged)
-            {
-                if (!tile.IsBomb() && tile.IsBadFlagged)
-                {
-                    return badFlagSprite;
-                }
-                return flagSprite;
-            }
-
-            return hiddenSprite;
-        }
-
-        if (tile.ClickedBomb)
-            return clickedBombSprite;
-        
-        switch (index)
-        {
-            case <= BOMB_INDEX:
-                return bombSprite;
-            case 0:
-                return emptySprite;
-        }
-        return new TileSprite(0 + MathHelper.Clamp(index - 1, 0, 7), TILE_HEIGHT);
     }
 }
