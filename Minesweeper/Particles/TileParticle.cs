@@ -26,8 +26,8 @@ class TileParticle : PhysicsParticle
         float horizontalVariation = Globals.Random.Next(-50, 50);
 
         Velocity = new Vector2(
-            horizontalVariation is > -15 and < 15
-                ? horizontalVariation < 0 ? -15 : 15
+            horizontalVariation is > -20 and < 20
+                ? horizontalVariation < 0 ? -20 : 20
                 : horizontalVariation, -speed);
         Lifespan = lifespan;
         CurrentLife = Lifespan;

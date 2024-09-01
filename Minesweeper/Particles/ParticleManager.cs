@@ -2,16 +2,11 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Minesweeper.DataHolders;
-using Minesweeper.Entities;
-using Minesweeper.Particles;
-
 namespace Minesweeper.Particles;
 
 public static class ParticleManager
 {
     private static List<Particle> particles = new List<Particle>();
-    private static Random random = new Random();
 
     public static void SpawnParticle(Particle particle, Vector2 position)
     {
@@ -22,7 +17,7 @@ public static class ParticleManager
     public static void SpawnInCircle(Particle particle, Vector2 position, float radius, int numberOfParticles = 5,
         float speed = 100f)
     {
-        Vector2 center = new Vector2(position.X, position.Y);
+        Vector2 center = new Vector2(position.X - particle.Sprite.width / 2, position.Y - particle.Sprite.width / 2);
 
         for (int i = 0; i < numberOfParticles; i++)
         {
@@ -66,7 +61,7 @@ public static class ParticleManager
             spriteBatch.Draw(particle.SpriteSheet, particle.Position,
                 particle.Sprite != null
                     ? new Rectangle(particle.Sprite.x, particle.Sprite.y, particle.Sprite.width,
-                        particle.Sprite.height) : null, particle.Color,
+                        particle.Sprite.height) : null, particle.Color * size,
                 particle.Rotation, new Vector2(0.5f * particle.Size * size, 0.5f * particle.Size * size),
                 particle.Size * size, SpriteEffects.None,
                 0f);

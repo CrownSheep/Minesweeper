@@ -38,7 +38,8 @@ public class GameStateManager : Clickable
         ParticleManager.SpawnInCircle(new PhysicsParticle
         {
             Sprite = new Sprite(Globals.TransparentSpriteSheet, 4, 27, 17, 17),
-        }, new Vector2(Position.X + Width / 4 - 0.3f, Position.Y + Height / 4), 0);
+            Size = 5
+        }, new Vector2(Position.X + Width / 2, Position.Y + Height / 2), 0);
     }
 
     public GameStateSprite GetSpriteByGameState(GameState state)

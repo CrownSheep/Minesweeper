@@ -71,35 +71,11 @@ public class Game1 : Game
         Globals.SpriteBatch = spriteBatch;
         spriteSheetTexture = Content.Load<Texture2D>(SPRITESHEET_ASSET_NAME);
         Globals.MainSpriteSheet = spriteSheetTexture;
-        transSpriteSheetTexture = MakeGrayPixelsTransparent(spriteSheetTexture);
+        transSpriteSheetTexture = Content.Load<Texture2D>("transparent_" + SPRITESHEET_ASSET_NAME);
         Globals.TransparentSpriteSheet = transSpriteSheetTexture;
 
         LoadGameWithConfig(DefaultConfig);
         gameManager = new GameManager(this, spriteSheetTexture, Config);
-    }
-
-    private Texture2D MakeGrayPixelsTransparent(Texture2D texture)
-    {
-        Color[] pixels = new Color[texture.Width * texture.Height];
-        texture.GetData(pixels);
-
-        for (int i = 0; i < pixels.Length; i++)
-        {
-            Color pixel = pixels[i];
-            if (IsGray(pixel))
-            {
-                pixels[i] = Color.Transparent;
-            }
-        }
-
-        Texture2D newTexture = new Texture2D(GraphicsDevice, texture.Width, texture.Height);
-        newTexture.SetData(pixels);
-        return newTexture;
-    }
-
-    private bool IsGray(Color color)
-    {
-        return color.R == color.G && color.G == color.B && color is not { R: 0, G: 0, B: 0 };
     }
 
     protected override void Update(GameTime gameTime)
