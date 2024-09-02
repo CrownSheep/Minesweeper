@@ -6,7 +6,7 @@ public class PhysicsParticle : Particle
 {
     public Vector2 Velocity;
     public float Gravity = 98f;
-    private int InitialRotation => Velocity.X > 0 ? 1 : -1;
+    private int InitialDirection => Velocity.X > 0 ? 1 : -1;
 
     public PhysicsParticle(Vector2 velocity = default)
     {
@@ -20,6 +20,6 @@ public class PhysicsParticle : Particle
         Position += Velocity * deltaTime;
 
         float targetRotation = MathHelper.PiOver2 * (Velocity.Y / 200f);
-        Rotation = MathHelper.Lerp(Rotation, InitialRotation * targetRotation, 5f * deltaTime);
+        Rotation = MathHelper.Lerp(Rotation, InitialDirection * targetRotation, 5f * deltaTime);
     }
 }

@@ -35,10 +35,9 @@ public class GameStateManager : Clickable
         game.LoadGameWithConfig(game.Config);
         game.GameState = GameState.Playing;
         restartAction.Invoke();
-        ParticleManager.SpawnInCircle(new PhysicsParticle
+        ParticleManager.SpawnInCircle(new PhysicsParticle()
         {
             Sprite = new Sprite(Globals.TransparentSpriteSheet, 4, 27, 17, 17),
-            Size = 5
         }, new Vector2(Position.X + Width / 2, Position.Y + Height / 2), 0);
     }
 
