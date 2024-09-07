@@ -20,12 +20,12 @@ public class Timer
         this.loop = loop;
     }
 
-    public void setDuration(float duration)
+    public void SetDuration(float duration)
     {
         this.duration = duration;
     }
     
-    public void setPaused(bool paused)
+    public void SetPaused(bool paused)
     {
         this.paused = paused;
     }

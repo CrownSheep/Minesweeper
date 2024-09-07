@@ -21,7 +21,7 @@ public class TopSectionManager
     {
         this.game = game;
         timer.FinishEvent += OnSecondIncrement;
-        timer.setPaused(true);
+        timer.SetPaused(true);
         this.gridManager = gridManager;
         this.gridManager.ClickEvent += OnClickEvent;
     }
@@ -30,7 +30,7 @@ public class TopSectionManager
     {
         if (game.IsActive)
         {
-            timer.setDuration(InactiveSeconds > MIN_INACTIVE_TIME ? 0.02f : 1f);
+            timer.SetDuration(InactiveSeconds > MIN_INACTIVE_TIME ? 0.02f : 1f);
         }
     }
     
@@ -75,7 +75,7 @@ public class TopSectionManager
                 return;
             
             if (!tile.Flagged)
-                timer.setPaused(false);
+                timer.SetPaused(false);
         }
     }
     

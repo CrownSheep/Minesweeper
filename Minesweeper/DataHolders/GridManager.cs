@@ -44,7 +44,7 @@ public class GridManager
 
     private void OnTimer(object sender, EventArgs e)
     {
-        if (Won())
+        if (game.GameState == GameState.Win)
         {
             GridTile[] aboveZ = Grid.Cast<GridTile>().Where(tile => tile.Index > 0).ToArray();
             if (aboveZ.Length > 0)

@@ -47,12 +47,12 @@ public class GameManager
 
     public void OnLose(object sender, EventArgs args)
     {
-        topSectionManager.timer.setPaused(true);
+        topSectionManager.timer.SetPaused(true);
     }
     
     public void OnWin(object sender, EventArgs args)
     {
-        topSectionManager.timer.setPaused(true);
+        topSectionManager.timer.SetPaused(true);
     }
 
     public void Update(GameTime gameTime)
