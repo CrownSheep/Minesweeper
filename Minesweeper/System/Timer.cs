@@ -18,6 +18,7 @@ public class Timer
         this.duration = duration;
         remainingTime = this.duration;
         this.loop = loop;
+        paused = !loop;
     }
 
     public void SetDuration(float duration)
