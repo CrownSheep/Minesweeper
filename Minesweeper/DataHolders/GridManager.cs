@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Minesweeper.Extensions;
-using Minesweeper.Graphics;
 using Minesweeper.Particles;
 using Minesweeper.System;
 
@@ -11,7 +10,7 @@ namespace Minesweeper.DataHolders;
 
 public class GridManager
 {
-    public readonly Timer timer = new Timer(0.5f, true);
+    public readonly Timer celebrationParticleTimer = new Timer(0.5f, true);
     public GridTile[,] Grid { get; private set; }
 
     private bool initialTile = true;
@@ -39,10 +38,10 @@ public class GridManager
         this.game = game;
         random = new Random();
         Position = position;
-        timer.FinishEvent += OnTimer;
+        celebrationParticleTimer.FinishEvent += OnCelebrationParticleTimer;
     }
 
-    private void OnTimer(object sender, EventArgs e)
+    private void OnCelebrationParticleTimer(object sender, EventArgs e)
     {
         if (game.GameState == GameState.Win)
         {

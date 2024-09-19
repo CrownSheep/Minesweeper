@@ -66,7 +66,7 @@ public class GameManager
         {
             tile.Update(gameTime);
         }
-        gridManager.timer.Tick(gameTime);
+        gridManager.celebrationParticleTimer.Tick(gameTime);
 
         if (KeyboardManager.WasKeyDown(Keys.W))
         {
@@ -90,7 +90,7 @@ public class GameManager
             DrawNumber(spriteBatch, topSectionManager.LeftFlags,
                 topSectionFrame.Width - 16 - TEXTURE_COORDS_NUMBER_WIDTH * 3, topSectionFrame.Y + 16);
         }
-
+        
         gameStateManager.GetSpriteByGameState(game.GameState).Draw(spriteBatch, spriteSheet, gameStateManager.Position);
 
         foreach (GridTile tile in gridManager.Grid)
