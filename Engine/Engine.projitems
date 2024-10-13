@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>6efba8a9-a407-4029-bdd0-651d22a87386</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Engine</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Content\" />
+  </ItemGroup>
+  <ItemGroup>
+    <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
+    <None Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Globals.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OnClickEventArgs.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)OnFlagEventArgs.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)System/Timer.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Mouse/MouseButtons.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Mouse/MouseManager.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Mouse/ScrollDirection.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Keyboard/KeyboardManager.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Keyboard/MultiKey.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Particles/Particle.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Particles/ParticleManager.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Particles/PhysicsParticle.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Particles/TileParticle.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)NineSliceSystem/Frame.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)NineSliceSystem/FrameElement.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Graphics/AnimatedSprite.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Graphics/Sprite.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Graphics/SpriteAnimationFrame.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Extensions/ExtensionUtils.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Extensions/RectangleExt.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Extensions/SpriteBatchExt.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Extensions/Vector2Ext.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Entities/Clickable.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Entities/GameManager.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Entities/GameStateSprite.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Entities/GridFrame.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Entities/TileSprite.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)Entities/TopSectionFrame.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/GameConfig.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/GameStateManager.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/GridManager.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/GridTile.cs" />
+	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/TopSectionManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Touch\TouchManager.cs" />
+  </ItemGroup>
+ </Project>
