@@ -147,9 +147,9 @@ public class Main : Game
         
         spriteBatch.End();
         
-        spriteBatch.Begin(blendState: BlendState.Additive, samplerState: SamplerState.PointClamp, transformMatrix: TransformMatrix);
-        spriteBatch.DrawString(font, GAME_TITLE, Vector2.Zero, Color.White);
-        spriteBatch.End();
+        // spriteBatch.Begin(blendState: BlendState.Additive, samplerState: SamplerState.PointClamp, transformMatrix: TransformMatrix);
+        // spriteBatch.DrawString(font, GAME_TITLE, Vector2.Zero, Color.White);
+        // spriteBatch.End();
 
 
         base.Draw(gameTime);

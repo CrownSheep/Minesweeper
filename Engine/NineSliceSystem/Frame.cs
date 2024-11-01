@@ -39,14 +39,42 @@ public class Frame
 
     public void Draw(SpriteBatch spriteBatch, Texture2D spriteSheet)
     {
-        elements[0].Draw(spriteBatch, spriteSheet, X, Y);
-        elements[1].Draw(spriteBatch, spriteSheet, X + elements[0].textureWidth, Y);
-        elements[2].Draw(spriteBatch, spriteSheet, Width - elements[2].textureWidth, Y);
-        elements[3].Draw(spriteBatch, spriteSheet, X, Y + elements[0].textureHeight);
-        elements[4].Draw(spriteBatch, spriteSheet, Width - elements[4].textureWidth, Y + elements[2].textureHeight);
-        elements[5].Draw(spriteBatch, spriteSheet, X, Y + Height - elements[5].textureHeight);
-        elements[6].Draw(spriteBatch, spriteSheet, X + elements[5].textureWidth, Y + Height - elements[5].textureHeight);
-        elements[7].Draw(spriteBatch, spriteSheet, Width - elements[7].textureWidth, Y + Height - elements[7].textureHeight);
+        for (int i = 0; i < elements.Length; i++)
+        {
+            int posX = X;
+            int posY = Y;
+
+            switch (i)
+            {
+                // Calculate X position
+                case 2:
+                case 4:
+                // Right aligned elements
+                case 7:
+                    posX = Width - elements[i].textureWidth;
+                    break;
+                case 1:
+                // Center elements horizontally
+                case 6:
+                    posX += elements[0].textureWidth;
+                    break;
+            }
+
+            switch (i)
+            {
+                // Calculate Y position
+                // Middle row
+                case >= 3 and <= 4:
+                    posY += elements[0].textureHeight;
+                    break;
+                // Bottom row
+                case >= 5:
+                    posY += Height - elements[i].textureHeight;
+                    break;
+            }
+
+            elements[i].Draw(spriteBatch, spriteSheet, posX, posY);
+        }
     }
 
     public FrameElement getElementByIndex(int index)
