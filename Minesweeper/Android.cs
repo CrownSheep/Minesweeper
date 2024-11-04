@@ -1,6 +1,6 @@
 ﻿namespace Minesweeper;
 
-public class Android
+public static class Android
 {
     private class DefaultAndroidService : Main.IAndroidService
     {
