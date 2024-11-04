@@ -52,10 +52,10 @@ public class Main : Game
         get =>
             transformMatrix ?? Matrix.Identity *
             Matrix.CreateScale(
-                Environment == GameEnvironments.DESKTOP
+                Environment == GameEnvironments.Desktop
                     ? DESKTOP_DEFAULT_ZOOM_FACTOR
                     : ANDROID_DEFAULT_ZOOM_FACTOR - 0.06f,
-                Environment == GameEnvironments.DESKTOP
+                Environment == GameEnvironments.Desktop
                     ? DESKTOP_DEFAULT_ZOOM_FACTOR
                     : ANDROID_DEFAULT_ZOOM_FACTOR - 0.02f, 1);
         set => transformMatrix = value;
@@ -64,21 +64,36 @@ public class Main : Game
     private Matrix? transformMatrix;
 
     private GameManager gameManager;
-    GameConfig DefaultConfig => Environment == GameEnvironments.DESKTOP ? GameConfig.BEGINNER : GameConfig.MOBILE;
+
+    GameConfig DefaultConfig
+    {
+        get
+        {
+            bool vertical = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width <
+                            GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+            return Environment == GameEnvironments.Desktop
+                ? new GameConfig(12, 12, 24, false)
+                : new GameConfig(vertical ? 9 : 16,
+                    vertical ? 16 : 9,
+                    21, false);
+        }
+    }
+
     public GameConfig Config { get; private set; }
     public GameState GameState { get; set; }
     public GameEnvironments Environment { get; set; }
     public DisplayMode WindowDisplayMode { get; set; } = DisplayMode.Default;
+
     public int ZoomFactor => WindowDisplayMode == DisplayMode.Default
-        ? Environment == GameEnvironments.DESKTOP ? DESKTOP_DEFAULT_ZOOM_FACTOR : ANDROID_DEFAULT_ZOOM_FACTOR
+        ? Environment == GameEnvironments.Desktop ? DESKTOP_DEFAULT_ZOOM_FACTOR : ANDROID_DEFAULT_ZOOM_FACTOR
         : DISPLAY_ZOOM_FACTOR;
 
-    public Main(GameEnvironments env = GameEnvironments.DESKTOP, IAndroidService androidService = null)
+    public Main(GameEnvironments env = GameEnvironments.Desktop, IAndroidService androidService = null)
     {
         graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        if(androidService != null)
+        if (androidService != null)
             Android.Service = androidService;
         Environment = env;
     }
@@ -88,8 +103,8 @@ public class Main : Game
         base.Initialize();
 
         Window.Title = GAME_TITLE;
-        
-        graphics.IsFullScreen = Environment == GameEnvironments.ANDROID;
+
+        graphics.IsFullScreen = Environment == GameEnvironments.Android;
         RefreshWindowDimensions();
         graphics.SynchronizeWithVerticalRetrace = true;
         graphics.SupportedOrientations = DisplayOrientation.Portrait;
@@ -144,9 +159,9 @@ public class Main : Game
 
         gameManager.Draw(spriteBatch, gameTime);
         ParticleManager.Draw(spriteBatch);
-        
+
         spriteBatch.End();
-        
+
         // spriteBatch.Begin(blendState: BlendState.Additive, samplerState: SamplerState.PointClamp, transformMatrix: TransformMatrix);
         // spriteBatch.DrawString(font, GAME_TITLE, Vector2.Zero, Color.White);
         // spriteBatch.End();
@@ -157,10 +172,10 @@ public class Main : Game
 
     private void RefreshWindowDimensions()
     {
-        graphics.PreferredBackBufferWidth = Environment == GameEnvironments.DESKTOP
+        graphics.PreferredBackBufferWidth = Environment == GameEnvironments.Desktop
             ? WindowWidth * ZoomFactor
             : GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-        graphics.PreferredBackBufferHeight = Environment == GameEnvironments.DESKTOP
+        graphics.PreferredBackBufferHeight = Environment == GameEnvironments.Desktop
             ? WindowHeight * ZoomFactor
             : GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
         graphics.ApplyChanges();

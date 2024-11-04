@@ -2,6 +2,6 @@
 
 public enum GameEnvironments
 {
-    DESKTOP,
-    ANDROID
+    Desktop,
+    Android
 }
