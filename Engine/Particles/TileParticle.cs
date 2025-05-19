@@ -1,11 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Minesweeper.DataHolders;
 
 namespace Minesweeper.Particles;
 
-class TileParticle : PhysicsParticle
+public class TileParticle : PhysicsParticle
 {
-
     public TileParticle(GridTile tile, bool useTransparent = true, float lifespan = 2.5f)
     {
         Position = tile.Position;
@@ -31,8 +31,7 @@ class TileParticle : PhysicsParticle
                 : horizontalVariation, -speed);
         Lifespan = lifespan;
         CurrentLife = Lifespan;
-        if (useTransparent)
-            SpriteSheet = Globals.TransparentSpriteSheet;
+        SpriteSheet = useTransparent ? Globals.TransparentSpriteSheet : Globals.MainSpriteSheet;
     }
 
 }

@@ -18,9 +18,9 @@ public abstract class Clickable
 
     protected readonly Main game;
 
-    private readonly MouseButtons[] instantButtons;
+    private readonly MouseButton[] instantButtons;
 
-    protected Clickable(Main game, Vector2 position, int width, int height, params MouseButtons[] instantButtons)
+    protected Clickable(Main game, Vector2 position, int width, int height, params MouseButton[] instantButtons)
     {
         this.game = game;
         Position = position;
@@ -36,25 +36,25 @@ public abstract class Clickable
 
         if (!(MouseManager.Hover(Bounds) || TouchManager.Inside(Bounds))) return;
 
-        if (CheckClick(MouseButtons.Left))
+        if (CheckClick(MouseButton.Left))
             OnLeftMouseClick();
-        if (CheckClick(MouseButtons.Right))
+        if (CheckClick(MouseButton.Right))
             OnRightMouseClick();
-        if (CheckClick(MouseButtons.Middle))
+        if (CheckClick(MouseButton.Middle))
             OnMiddleMouseClick();
     }
 
-    private bool CheckClick(MouseButtons button)
+    private bool CheckClick(MouseButton button)
     {
         bool mobileClicked = button switch
         {
-            MouseButtons.Left => TouchManager.WasReleased() && !TouchManager.PutFlagged(),
-            MouseButtons.Right => TouchManager.HeldOver(),
+            MouseButton.Left => TouchManager.WasReleased() && !TouchManager.PutFlagged(),
+            MouseButton.Right => TouchManager.HeldOver(),
             _ => false
         };
         return (instantButtons.Contains(button)
             ? MouseManager.WasClicked(button)
-            : MouseManager.WasReleased(button)) || mobileClicked;
+            : MouseManager.WasReleased(button)) || (game.Environment == GameEnvironments.Android && mobileClicked);
     }
 
     protected bool CanInteract()

@@ -2,11 +2,21 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Minesweeper.DataHolders;
+
 namespace Minesweeper.Particles;
 
 public static class ParticleManager
 {
     private static List<Particle> particles = new List<Particle>();
+    
+    public static TileParticle SpawnTileParticle(GridTile tile, bool useTransparent, float lifespan = 2.5f)
+    {
+        TileParticle particle = new TileParticle(tile, useTransparent, lifespan);
+        SpawnParticle(particle, tile.Position);
+
+        return particle; 
+    }
 
     public static void SpawnParticle(Particle particle, Vector2 position)
     {

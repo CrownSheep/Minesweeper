@@ -1,6 +1,6 @@
 ﻿namespace Minesweeper.System;
 
-public enum MouseButtons
+public enum MouseButton
 {
     Left,
     Right,

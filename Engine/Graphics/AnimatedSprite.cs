@@ -3,18 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Minesweeper.Graphics;
 
 namespace Minesweeper.Graphics
 {
     public class AnimatedSprite
     {
-        private List<SpriteAnimationFrame> frames = new List<SpriteAnimationFrame>();
+        private List<SpriteAnimationFrame> frames = [];
 
-        public SpriteAnimationFrame this[int index]
-        {
-            get { return GetFrame(index); }
-        }
+        public SpriteAnimationFrame this[int index] => GetFrame(index);
 
         public int FrameCount => frames.Count;
 
@@ -57,7 +53,7 @@ namespace Minesweeper.Graphics
 
                 if (PlaybackProgress > Duration)
                 {
-                    if(ShouldLoop)
+                    if (ShouldLoop)
                         PlaybackProgress -= Duration;
                     else
                         Stop();
@@ -98,7 +94,8 @@ namespace Minesweeper.Graphics
             frames.Clear();
         }
 
-        public static AnimatedSprite createSimpleAnimation(Texture2D texture, Point startPos ,int width, int height, Point offset, int frameCount, float frameLength)
+        public static AnimatedSprite createSimpleAnimation(Texture2D texture, Point startPos, int width, int height,
+            Point offset, int frameCount, float frameLength)
         {
             if (texture == null)
                 throw new ArgumentNullException(nameof(texture));
@@ -109,7 +106,7 @@ namespace Minesweeper.Graphics
                 Sprite sprite = new Sprite(texture, startPos.X + i * offset.X, startPos.Y + i * offset.Y, width,
                     height);
                 anim.AddFrame(sprite, frameLength * i);
-                if(i == frameCount - 1)
+                if (i == frameCount - 1)
                     anim.AddFrame(sprite, frameLength * (i + 1));
             }
 

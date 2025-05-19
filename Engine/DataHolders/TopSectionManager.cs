@@ -69,7 +69,7 @@ public class TopSectionManager
     {
         GridTile tile = (GridTile) sender;
         OnClickEventArgs clickEventArgs = (OnClickEventArgs) e;
-        if (clickEventArgs.Button == MouseButtons.Left)
+        if (clickEventArgs.Button == MouseButton.Left)
         {
             if(gridManager.RevealedBombs)
                 return;

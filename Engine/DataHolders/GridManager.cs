@@ -49,7 +49,7 @@ public class GridManager
             if (aboveZ.Length > 0)
             {
                 GridTile tile = aboveZ[random.Next(0, aboveZ.Length)];
-                ParticleManager.SpawnParticle(new TileParticle(tile), tile.Position);
+                ParticleManager.SpawnTileParticle(tile, true);
                 tile.Index = GridTile.EMPTY_INDEX;
             }
         }
@@ -111,7 +111,7 @@ public class GridManager
         initialTile = false;
     }
 
-    protected virtual void OnClickEvent(GridTile tile, MouseButtons button)
+    protected virtual void OnClickEvent(GridTile tile, MouseButton button)
     {
         EventHandler handler = ClickEvent;
         handler?.Invoke(tile, new OnClickEventArgs(button));
@@ -152,12 +152,12 @@ public class GridManager
     public void Win()
     {
         GridTile[] nonBombTiles = Grid.Cast<GridTile>().Where(tile => !tile.IsBomb()).ToArray();
-        OnClickTile(nonBombTiles[random.Next(nonBombTiles.Length)], new OnClickEventArgs(MouseButtons.Left));
+        OnClickTile(nonBombTiles[random.Next(nonBombTiles.Length)], new OnClickEventArgs(MouseButton.Left));
         foreach (GridTile tile in Grid)
         {
             if (tile.IsEmpty())
             {
-                OnClickTile(tile, new OnClickEventArgs(MouseButtons.Left));
+                OnClickTile(tile, new OnClickEventArgs(MouseButton.Left));
             }
         }
     }
@@ -165,10 +165,10 @@ public class GridManager
     private void OnClickTile(object sender, EventArgs e)
     {
         GridTile clickedTile = (GridTile)sender;
-        MouseButtons button = ((OnClickEventArgs)e).Button;
+        MouseButton button = ((OnClickEventArgs)e).Button;
         bool userClick = ((OnClickEventArgs)e).UserClick;
 
-        if (button == MouseButtons.Left)
+        if (button == MouseButton.Left)
         {
             OnClickEvent(clickedTile, button);
             if (!RevealedBombs && !clickedTile.Flagged)
@@ -181,7 +181,7 @@ public class GridManager
                 }
 
                 if (clickedTile.Hidden && userClick)
-                    ParticleManager.SpawnParticle(new TileParticle(clickedTile, false, 2f), clickedTile.Position);
+                    ParticleManager.SpawnTileParticle(clickedTile, false);
 
                 if (clickedTile.IsEmpty())
                 {
@@ -210,13 +210,13 @@ public class GridManager
             }
         }
 
-        if (button == MouseButtons.Right)
+        if (button == MouseButton.Right)
         {
             if (clickedTile.IsHidden() && !RevealedBombs)
             {
                 Android.Service.Vibrate(100);
                 if (clickedTile.Flagged)
-                    ParticleManager.SpawnParticle(new TileParticle(clickedTile), clickedTile.Position);
+                    ParticleManager.SpawnTileParticle(clickedTile, true);
                 clickedTile.Flag();
             }
         }
@@ -284,18 +284,18 @@ public class GridManager
                     GridTile adjacentTile = Grid[adjacentX, adjacentY];
                     if (adjacentTile.IsHidden() && !adjacentTile.Flagged)
                     {
-                        ParticleManager.SpawnParticle(new TileParticle(adjacentTile, false, 2f), adjacentTile.Position);
+                        ParticleManager.SpawnTileParticle(adjacentTile, false);
                         if (!adjacentTile.IsBomb())
                             adjacentTile.SetIndex(AdjacentBombCount(adjacentTile));
                         adjacentTile.Hidden = false;
-                        OnClickTile(adjacentTile, new OnClickEventArgs(MouseButtons.Left, false));
+                        OnClickTile(adjacentTile, new OnClickEventArgs(MouseButton.Left, false));
                     }
                 }
             }
         }
     }
 
-    private void RevealAdjacentEmptyTiles(GridTile clickedTile, MouseButtons button)
+    private void RevealAdjacentEmptyTiles(GridTile clickedTile, MouseButton button)
     {
         int[] positions = { -1, 0, 1 };
         foreach (int xPosition in positions)
@@ -312,8 +312,7 @@ public class GridManager
                     {
                         if (adjacentTile.IsEmpty() && adjacentTile.IsHidden() && !adjacentTile.Flagged)
                         {
-                            ParticleManager.SpawnParticle(new TileParticle(adjacentTile, false, 2f),
-                                clickedTile.Position);
+                            ParticleManager.SpawnTileParticle(adjacentTile, false);
                             adjacentTile.SetIndex(AdjacentBombCount(adjacentTile));
                             adjacentTile.Hidden = false;
                             OnClickTile(adjacentTile, new OnClickEventArgs(button, false));

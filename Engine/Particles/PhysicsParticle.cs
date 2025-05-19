@@ -4,14 +4,18 @@ namespace Minesweeper.Particles;
 
 public class PhysicsParticle : Particle
 {
+    public const float DEFAULT_GRAVITY = 98f;
     public Vector2 Velocity;
-    public float Gravity = 98f;
+    public float Gravity;
+    
     private int InitialDirection => Velocity.X > 0 ? 1 : -1;
 
-    public PhysicsParticle(Vector2 velocity = default)
+    public PhysicsParticle(Vector2 velocity = default, float gravity = DEFAULT_GRAVITY)
     {
         Velocity = velocity;
+        Gravity = gravity;
     }
+    
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);

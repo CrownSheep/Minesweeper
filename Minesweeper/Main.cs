@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -37,8 +38,8 @@ public class Main : Game
     private const int DESKTOP_DEFAULT_ZOOM_FACTOR = 2;
     private const int ANDROID_DEFAULT_ZOOM_FACTOR = 6;
 
-    public int WindowWidth => Config.width * 18 + 20;
-    public int WindowHeight => 56 + Config.height * 18 + 10;
+    public int WindowWidth => Config.width * GridTile.TILE_WIDTH + 20;
+    public int WindowHeight => 56 + Config.height * GridTile.TILE_HEIGHT + 10;
 
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
@@ -65,14 +66,14 @@ public class Main : Game
 
     private GameManager gameManager;
 
-    GameConfig DefaultConfig
+    private GameConfig DefaultConfig
     {
         get
         {
             bool vertical = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width <
                             GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             return Environment == GameEnvironments.Desktop
-                ? new GameConfig(12, 12, 24, false)
+                ? GameConfig.Beginner
                 : new GameConfig(vertical ? 9 : 16,
                     vertical ? 16 : 9,
                     21, false);
@@ -93,8 +94,9 @@ public class Main : Game
         graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        if (androidService != null)
+        if(androidService != null)
             Android.Service = androidService;
+        
         Environment = env;
     }
 

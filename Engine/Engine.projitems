@@ -21,7 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)OnClickEventArgs.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)OnFlagEventArgs.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)System/Timer.cs" />
-	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Mouse/MouseButtons.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Mouse\MouseButton.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Mouse/MouseManager.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Mouse/ScrollDirection.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Keyboard/KeyboardManager.cs" />

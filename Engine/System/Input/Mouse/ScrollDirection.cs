@@ -4,5 +4,5 @@ public enum ScrollDirection
 {
     Up,
     Down,
-    Both
+    None
 }

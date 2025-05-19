@@ -21,7 +21,7 @@ public static class SpriteBatchExt
         ExtensionUtils.ThrowNullError(ref spriteBatch);
         
         Texture2D texture = new Texture2D(spriteBatch.GraphicsDevice, 1, 1);
-        texture.SetData(new []{Color.White});
+        texture.SetData(new []{color});
 
         spriteBatch.Draw(texture, new Rectangle(rectangle.X, rectangle.Y, lineWidth, rectangle.Height + lineWidth), color);
         spriteBatch.Draw(texture, new Rectangle(rectangle.X, rectangle.Y, rectangle.Width + lineWidth, lineWidth), color);

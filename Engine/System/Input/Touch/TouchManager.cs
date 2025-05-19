@@ -1,16 +1,18 @@
 ﻿using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
-using Minesweeper;
 
 namespace Swipe.Android.System.Input.Touch;
 
-public class TouchManager
+public static class TouchManager
 {
     private static TouchCollection touchState;
-    private static Stopwatch holdTimer = Stopwatch.StartNew();
-    private static Stopwatch clickTimer = Stopwatch.StartNew();
+    private static readonly Stopwatch holdTimer = Stopwatch.StartNew();
     private static bool putFlagged;
+
+    static TouchManager() {
+        holdTimer.Reset();
+    }
 
     public static void Update()
     {

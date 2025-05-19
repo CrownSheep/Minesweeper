@@ -11,7 +11,7 @@ public class Particle
     public float CurrentLife = 2;
     public Color Color = Color.White;
     public float Size = 1;
-    public float Rotation = 0;
+    public float Rotation;
     public bool IsAlive => CurrentLife > 0;
     public Sprite Sprite;
     private Texture2D spriteSheet;
@@ -20,7 +20,7 @@ public class Particle
         get
         {
             Texture2D texture = new Texture2D(Globals.SpriteBatch.GraphicsDevice, 1, 1);
-            texture.SetData(new []{Color.White});
+            texture.SetData([Color.White]);
             return spriteSheet ?? Sprite?.texture ?? texture;
         }
         set => spriteSheet = value;
@@ -28,12 +28,17 @@ public class Particle
     
     public Particle()
     {
-        Position = new(0, 0);
-        Lifespan = 2;
-        CurrentLife = Lifespan;
-        Color = Color.White;
-        Size = 1;
-        Rotation = 0;
+        Reset();
+    }
+
+    public void Reset(Vector2 position = default, float lifespan = 2, Color color = default, float size = 1, float rotation = 0)
+    {
+        Position = position;
+        Lifespan = lifespan;
+        CurrentLife = lifespan;
+        Color = color == default ? Color.White : color;
+        Size = size;
+        Rotation = rotation;
     }
 
     public Particle(Particle particle)

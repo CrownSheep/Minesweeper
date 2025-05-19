@@ -38,7 +38,7 @@ public class GridTile : Clickable
     public Vector2 gridPosition;
 
     public GridTile(Main game, Vector2 position, int width, int height, int xIndex, int yIndex) : base(game, position,
-        width, height, MouseButtons.Right)
+        width, height, MouseButton.Right)
     {
         this.xIndex = xIndex;
         this.yIndex = yIndex;
@@ -74,7 +74,7 @@ public class GridTile : Clickable
             }
             else
             {
-                if(MouseManager.WasReleased(MouseButtons.Left))
+                if(MouseManager.WasReleased(MouseButton.Left))
                     game.GameState = GameState.Playing;
                 
                 ShowHeld = false;
@@ -89,7 +89,7 @@ public class GridTile : Clickable
     {
         if (game.GameState != GameState.Lose && game.GameState != GameState.Win)
         {
-            OnClickEvent(MouseButtons.Left);
+            OnClickEvent(MouseButton.Left);
         }
     }
     
@@ -97,7 +97,7 @@ public class GridTile : Clickable
     {
         if (game.GameState != GameState.Lose && game.GameState != GameState.Win)
         {
-            OnClickEvent(MouseButtons.Right);
+            OnClickEvent(MouseButton.Right);
             TouchManager.ResetHoldTime();
         }
     }
@@ -121,7 +121,7 @@ public class GridTile : Clickable
     
     
     
-    protected virtual void OnClickEvent(MouseButtons button)
+    protected virtual void OnClickEvent(MouseButton button)
     {
         EventHandler handler = ClickEvent;
         handler?.Invoke(this, new OnClickEventArgs(button));

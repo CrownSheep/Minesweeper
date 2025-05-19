@@ -6,6 +6,7 @@ namespace Minesweeper.System.Input.Mouse;
 
 public static class MouseManager
 {
+    private const int SCROLL_UNIT = 120;
     private static MouseState mouseState, oldMouseState;
 
     public static void Update()
@@ -14,25 +15,25 @@ public static class MouseManager
         mouseState = Microsoft.Xna.Framework.Input.Mouse.GetState();
     }
 
-    private static ButtonState GetButtonState(MouseButtons button, bool old = false)
+    private static ButtonState GetButtonState(MouseButton button, bool old = false)
     {
         return button switch
         {
-            MouseButtons.Left => old ? oldMouseState.LeftButton : mouseState.LeftButton,
-            MouseButtons.Right => old ? oldMouseState.RightButton : mouseState.RightButton,
-            MouseButtons.Middle => old ? oldMouseState.MiddleButton : mouseState.MiddleButton,
+            MouseButton.Left => old ? oldMouseState.LeftButton : mouseState.LeftButton,
+            MouseButton.Right => old ? oldMouseState.RightButton : mouseState.RightButton,
+            MouseButton.Middle => old ? oldMouseState.MiddleButton : mouseState.MiddleButton,
             _ => old ? oldMouseState.LeftButton : mouseState.LeftButton
         };
     }
 
     public static int GetScrollWheelValue()
     {
-        return mouseState.ScrollWheelValue / 120;
+        return mouseState.ScrollWheelValue / SCROLL_UNIT;
     }
     
     public static int GetOldScrollWheelValue()
     {
-        return oldMouseState.ScrollWheelValue / 120;
+        return oldMouseState.ScrollWheelValue / SCROLL_UNIT;
     }
     
     public static int GetScrolledValue()
@@ -40,28 +41,27 @@ public static class MouseManager
         return GetScrollWheelValue() - GetOldScrollWheelValue();
     }
     
-    public static ScrollDirection? GetCurrentScrollDirection()
+    public static ScrollDirection GetCurrentScrollDirection()
     {
         return Math.Sign(GetScrolledValue()) switch
         {
             1 => ScrollDirection.Up,
             -1 => ScrollDirection.Down,
-            0 => null
+            _ => ScrollDirection.None
         };
     }
     
-    public static bool JustScrolledInDirection(ScrollDirection direction = ScrollDirection.Both)
+    public static bool JustScrolledInDirection(ScrollDirection direction = ScrollDirection.None)
     {
         return direction switch
         {
-            ScrollDirection.Both => GetScrollWheelValue() != GetOldScrollWheelValue(),
             ScrollDirection.Up => GetScrollWheelValue() > GetOldScrollWheelValue(),
             ScrollDirection.Down => GetScrollWheelValue() < GetOldScrollWheelValue(),
             _ => GetScrollWheelValue() != GetOldScrollWheelValue()
         };
     }
 
-    public static bool WasReleased(MouseButtons button)
+    public static bool WasReleased(MouseButton button)
     {
         ButtonState buttonState = GetButtonState(button);
         ButtonState oldButtonState = GetButtonState(button, true);
@@ -69,7 +69,7 @@ public static class MouseManager
         return buttonState == ButtonState.Released && oldButtonState == ButtonState.Pressed;
     }
 
-    public static bool WasClicked(MouseButtons button)
+    public static bool WasClicked(MouseButton button)
     {
         ButtonState buttonState = GetButtonState(button);
         ButtonState oldButtonState = GetButtonState(button, true);
@@ -77,7 +77,7 @@ public static class MouseManager
         return buttonState == ButtonState.Pressed && oldButtonState == ButtonState.Released;
     }
     
-    public static bool IsCurrently(ButtonState buttonState, MouseButtons button)
+    public static bool IsCurrently(ButtonState buttonState, MouseButton button)
     {        
         return GetButtonState(button) == buttonState;
     }
