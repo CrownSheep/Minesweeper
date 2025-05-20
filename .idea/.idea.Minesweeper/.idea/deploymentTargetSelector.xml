@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="Minesweeper.Android">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-11-09T10:10:54.829851800Z">
+        <DropdownSelection timestamp="2025-05-19T18:46:27.568984300Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Oren-PC\.android\avd\pixel_5_-_api_31.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Oren-PC\.android\avd\Resizable_Experimental_API_34.avd" />
             </handle>
           </Target>
         </DropdownSelection>

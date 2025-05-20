@@ -1,34 +1,21 @@
 ﻿using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Minesweeper.System;
 using Minesweeper.System.Input.Mouse;
 using Swipe.Android.System.Input.Touch;
 
 namespace Minesweeper.Entities;
 
-public abstract class Clickable
+public abstract class Clickable(Main game, Vector2 position, int width, int height, params MouseButton[] instantButtons)
 {
-    public Vector2 Position { get; }
-    public int Width { get; }
-    public int Height { get; }
+    public Vector2 Position { get; } = position;
+    public int Width { get; } = width;
+    public int Height { get; } = height;
 
-    protected Rectangle Bounds => new Rectangle((Position * game.ZoomFactor).ToPoint(),
-        new Point((int)(Width * game.ZoomFactor), (int)(Height * game.ZoomFactor)));
+    protected Rectangle Bounds => new((Position * game.ZoomFactor).ToPoint(),
+        new Point(Width * game.ZoomFactor, Height * game.ZoomFactor));
 
-    protected readonly Main game;
-
-    private readonly MouseButton[] instantButtons;
-
-    protected Clickable(Main game, Vector2 position, int width, int height, params MouseButton[] instantButtons)
-    {
-        this.game = game;
-        Position = position;
-        Width = width;
-        Height = height;
-        this.instantButtons = instantButtons;
-    }
-
+    protected readonly Main game = game;
 
     public virtual void Update(GameTime gameTime)
     {

@@ -24,8 +24,8 @@ public class Frame
         Y = y;
         Width = width;
         Height = height;
-        elements = new FrameElement[]
-        {
+        elements =
+        [
             topLeft, 
             middleTop, 
             topRight, 
@@ -34,7 +34,7 @@ public class Frame
             bottomLeft, 
             bottomMiddle, 
             bottomRight
-        };
+        ];
     }
 
     public void Draw(SpriteBatch spriteBatch, Texture2D spriteSheet)

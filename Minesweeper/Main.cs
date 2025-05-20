@@ -50,15 +50,18 @@ public class Main : Game
 
     public Matrix TransformMatrix
     {
-        get =>
-            transformMatrix ?? Matrix.Identity *
-            Matrix.CreateScale(
-                Environment == GameEnvironments.Desktop
-                    ? DESKTOP_DEFAULT_ZOOM_FACTOR
-                    : ANDROID_DEFAULT_ZOOM_FACTOR - 0.06f,
-                Environment == GameEnvironments.Desktop
-                    ? DESKTOP_DEFAULT_ZOOM_FACTOR
-                    : ANDROID_DEFAULT_ZOOM_FACTOR - 0.02f, 1);
+        get
+        {
+            var actualWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            var actualHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+
+            float scaleX = (float)actualWidth / WindowWidth;
+            float scaleY = (float)actualHeight / WindowHeight;
+
+            float uniformScale = Math.Min(scaleX, scaleY);
+
+            return Matrix.CreateScale(uniformScale, uniformScale + 0.05f, 1f);
+        }
         set => transformMatrix = value;
     }
 
@@ -139,6 +142,8 @@ public class Main : Game
         Globals.Update(gameTime);
         ParticleManager.Update(gameTime);
 
+        gameManager.Update(gameTime);
+        
         MouseManager.Update();
         KeyboardManager.Update();
         TouchManager.Update();
@@ -148,7 +153,6 @@ public class Main : Game
             ToggleDisplayMode();
         }
 
-        gameManager.Update(gameTime);
 
         base.Update(gameTime);
     }
