@@ -44,7 +44,7 @@ public class GameStateManager : Clickable
 
     public GameStateSprite GetSpriteByGameState(GameState state)
     {
-        if (CanInteract() && (MouseManager.IsCurrently(ButtonState.Pressed, MouseButton.Left) || TouchManager.IsFingerPressed()))
+        if (CanInteract() && (MouseManager.IsCurrently(ButtonState.Pressed, MouseButton.Left) || TouchManager.HasIndex()))
         {
             return HeldPlayingSprite;
         }

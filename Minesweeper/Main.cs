@@ -50,18 +50,15 @@ public class Main : Game
 
     public Matrix TransformMatrix
     {
-        get
-        {
-            var actualWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-            var actualHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-
-            float scaleX = (float)actualWidth / WindowWidth;
-            float scaleY = (float)actualHeight / WindowHeight;
-
-            float uniformScale = Math.Min(scaleX, scaleY);
-
-            return Matrix.CreateScale(uniformScale, uniformScale + 0.05f, 1f);
-        }
+        get =>
+            transformMatrix ?? Matrix.Identity *
+            Matrix.CreateScale(
+                Environment == GameEnvironments.Desktop
+                    ? DESKTOP_DEFAULT_ZOOM_FACTOR
+                    : ANDROID_DEFAULT_ZOOM_FACTOR - 0.06f,
+                Environment == GameEnvironments.Desktop
+                    ? DESKTOP_DEFAULT_ZOOM_FACTOR
+                    : ANDROID_DEFAULT_ZOOM_FACTOR - 0.02f, 1);
         set => transformMatrix = value;
     }
 

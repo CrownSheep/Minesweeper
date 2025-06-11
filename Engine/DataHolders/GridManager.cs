@@ -8,7 +8,7 @@ using Minesweeper.System;
 
 namespace Minesweeper.DataHolders;
 
-public class GridManager
+public sealed class GridManager
 {
     public readonly Timer celebrationParticleTimer = new Timer(0.5f, true);
     public GridTile[,] Grid { get; private set; }
@@ -59,13 +59,16 @@ public class GridManager
     {
         Config = config;
         Grid = new GridTile[Config.width, Config.height];
+        // X
         for (int i = 0; i < Grid.GetLength(0); i++)
         {
+            // Y
             for (int j = 0; j < Grid.GetLength(1); j++)
             {
                 Grid[i, j] = new GridTile(game,
                     new Vector2(Position.X + i * GridTile.TILE_WIDTH, Position.Y + j * GridTile.TILE_HEIGHT),
                     GridTile.TILE_WIDTH, GridTile.TILE_HEIGHT, i, j);
+                
                 Grid[i, j].ClickEvent += OnClickTile;
                 Grid[i, j].RevealEvent += OnRevealTile;
                 Grid[i, j].FlagEvent += OnFlagTile;
@@ -111,19 +114,19 @@ public class GridManager
         initialTile = false;
     }
 
-    protected virtual void OnClickEvent(GridTile tile, MouseButton button)
+    private void OnClickEvent(GridTile tile, MouseButton button)
     {
         EventHandler handler = ClickEvent;
         handler?.Invoke(tile, new OnClickEventArgs(button));
     }
 
-    protected virtual void OnWinEvent()
+    private void OnWinEvent()
     {
         EventHandler handler = WinEvent;
         handler?.Invoke(this, EventArgs.Empty);
     }
 
-    protected virtual void OnLoseEvent()
+    private void OnLoseEvent()
     {
         EventHandler handler = LoseEvent;
         handler?.Invoke(this, EventArgs.Empty);
@@ -162,64 +165,90 @@ public class GridManager
         }
     }
 
-    private void OnClickTile(object sender, EventArgs e)
+    private void OnClickTile(object sender, OnClickEventArgs e)
     {
-        GridTile clickedTile = (GridTile)sender;
-        MouseButton button = ((OnClickEventArgs)e).Button;
-        bool userClick = ((OnClickEventArgs)e).UserClick;
+        var clickedTile = (GridTile)sender;
+        var button = e.Button;
+        var userClick = e.UserClick;
 
         if (button == MouseButton.Left)
         {
-            OnClickEvent(clickedTile, button);
-            if (!RevealedBombs && !clickedTile.Flagged)
-            {
-                if (initialTile)
-                {
-                    SetBombs(clickedTile, Config.bombCount);
-                    if (Config.showBombsAtStart)
-                        RevealAllBombs(clickedTile);
-                }
-
-                if (clickedTile.Hidden && userClick)
-                    ParticleManager.SpawnTileParticle(clickedTile, false);
-
-                if (clickedTile.IsEmpty())
-                {
-                    clickedTile.Reveal();
-                    clickedTile.SetIndex(AdjacentBombCount(clickedTile));
-                    RevealAdjacentEmptyTiles(clickedTile, button);
-                }
-                else if (!clickedTile.Hidden && clickedTile.Index > 0)
-                {
-                    RevealAdjacentEmptyTilesWithFlags(clickedTile);
-                }
-                else if (clickedTile.IsBomb())
-                {
-                    OnLoseEvent();
-                    game.GameState = GameState.Lose;
-                    RevealAllBombs(clickedTile);
-                    RevealedBombs = true;
-                }
-
-                if (Won())
-                {
-                    OnWinEvent();
-                    game.GameState = GameState.Win;
-                    RevealAllBombs(clickedTile, true);
-                }
-            }
+            HandleLeftClick(clickedTile, userClick);
         }
-
-        if (button == MouseButton.Right)
+        else if (button == MouseButton.Right)
         {
-            if (clickedTile.IsHidden() && !RevealedBombs)
-            {
-                Android.Service.Vibrate(100);
-                if (clickedTile.Flagged)
-                    ParticleManager.SpawnTileParticle(clickedTile, true);
-                clickedTile.Flag();
-            }
+            HandleRightClick(clickedTile);
         }
+    }
+
+    private void HandleLeftClick(GridTile tile, bool userClick)
+    {
+        OnClickEvent(tile, MouseButton.Left);
+        if (RevealedBombs || tile.Flagged) return;
+
+        if (initialTile)
+        {
+            SetBombs(tile, Config.bombCount);
+            if (Config.showBombsAtStart)
+                RevealAllBombs(tile);
+        }
+
+        if (tile.Hidden && userClick)
+            ParticleManager.SpawnTileParticle(tile, false);
+
+        if (tile.IsBomb())
+        {
+            HandleLose(tile);
+            return;
+        }
+
+        if (tile.IsEmpty())
+        {
+            RevealEmptyTile(tile);
+        }
+        else if (userClick && !tile.Hidden && tile.Index > 0)
+        {
+            RevealAdjacentEmptyTilesWithFlags(tile);
+        }
+        
+        if (Won())
+        {
+            HandleWin(tile);
+        }
+    }
+
+    private void HandleRightClick(GridTile tile)
+    {
+        if (!tile.IsHidden() || RevealedBombs) return;
+
+        Android.Service.Vibrate(100);
+
+        if (tile.Flagged)
+            ParticleManager.SpawnTileParticle(tile, true);
+
+        tile.Flag();
+    }
+
+    private void RevealEmptyTile(GridTile tile)
+    {
+        tile.Reveal();
+        tile.SetIndex(AdjacentBombCount(tile));
+        RevealAdjacentEmptyTiles(tile, MouseButton.Left);
+    }
+
+    private void HandleLose(GridTile bombTile)
+    {
+        OnLoseEvent();
+        game.GameState = GameState.Lose;
+        RevealAllBombs(bombTile);
+        RevealedBombs = true;
+    }
+
+    private void HandleWin(GridTile lastClickedTile)
+    {
+        OnWinEvent();
+        game.GameState = GameState.Win;
+        RevealAllBombs(lastClickedTile, true);
     }
 
     private bool Won()
@@ -284,7 +313,9 @@ public class GridManager
                     GridTile adjacentTile = Grid[adjacentX, adjacentY];
                     if (adjacentTile.IsHidden() && !adjacentTile.Flagged)
                     {
-                        ParticleManager.SpawnTileParticle(adjacentTile, false);
+                        if (game.Environment != GameEnvironments.Android)
+                            ParticleManager.SpawnTileParticle(adjacentTile, false);
+                        
                         if (!adjacentTile.IsBomb())
                             adjacentTile.SetIndex(AdjacentBombCount(adjacentTile));
                         adjacentTile.Hidden = false;
@@ -312,7 +343,9 @@ public class GridManager
                     {
                         if (adjacentTile.IsEmpty() && adjacentTile.IsHidden() && !adjacentTile.Flagged)
                         {
-                            ParticleManager.SpawnTileParticle(adjacentTile, false);
+                            if (game.Environment != GameEnvironments.Android)
+                                ParticleManager.SpawnTileParticle(adjacentTile, false);
+                            
                             adjacentTile.SetIndex(AdjacentBombCount(adjacentTile));
                             adjacentTile.Hidden = false;
                             OnClickTile(adjacentTile, new OnClickEventArgs(button, false));

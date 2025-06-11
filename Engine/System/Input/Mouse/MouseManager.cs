@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using static Microsoft.Xna.Framework.Input.Mouse;
 
 namespace Minesweeper.System.Input.Mouse;
 
@@ -12,7 +13,7 @@ public static class MouseManager
     public static void Update()
     {
         oldMouseState = mouseState;
-        mouseState = Microsoft.Xna.Framework.Input.Mouse.GetState();
+        mouseState = GetState();
     }
 
     private static ButtonState GetButtonState(MouseButton button, bool old = false)

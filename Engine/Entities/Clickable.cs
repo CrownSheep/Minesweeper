@@ -35,13 +35,14 @@ public abstract class Clickable(Main game, Vector2 position, int width, int heig
     {
         bool mobileClicked = button switch
         {
-            MouseButton.Left => TouchManager.WasReleased() && !TouchManager.PutFlagged(),
+            MouseButton.Left => TouchManager.WasReleased(),
             MouseButton.Right => TouchManager.HeldOver(),
             _ => false
         };
+        
         return (instantButtons.Contains(button)
             ? MouseManager.WasClicked(button)
-            : MouseManager.WasReleased(button)) || (game.Environment == GameEnvironments.Android && mobileClicked);
+            : MouseManager.WasReleased(button)) || mobileClicked;
     }
 
     protected bool CanInteract()

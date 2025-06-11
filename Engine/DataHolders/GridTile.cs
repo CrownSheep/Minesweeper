@@ -28,9 +28,9 @@ public class GridTile : Clickable
     public bool Flagged { get; set; }
     public bool IsBadFlagged { get; set; }
     public bool ClickedBomb { get; set; }
-    public event EventHandler ClickEvent;
+    public event EventHandler<OnClickEventArgs> ClickEvent;
+    public event EventHandler<OnFlagEventArgs> FlagEvent;
     public event EventHandler RevealEvent;
-    public event EventHandler FlagEvent;
 
     public int xIndex;
     public int yIndex;
@@ -87,19 +87,16 @@ public class GridTile : Clickable
 
     protected override void OnLeftMouseClick()
     {
-        if (game.GameState != GameState.Lose && game.GameState != GameState.Win)
-        {
-            OnClickEvent(MouseButton.Left);
-        }
+        if (game.GameState is GameState.Lose or GameState.Win) return;
+        
+        OnClickEvent(MouseButton.Left);
     }
     
     protected override void OnRightMouseClick()
     {
-        if (game.GameState != GameState.Lose && game.GameState != GameState.Win)
-        {
-            OnClickEvent(MouseButton.Right);
-            TouchManager.ResetHoldTime();
-        }
+        if (game.GameState is GameState.Lose or GameState.Win) return;
+        
+        OnClickEvent(MouseButton.Right);
     }
     
     public void Flag()
@@ -123,7 +120,7 @@ public class GridTile : Clickable
     
     protected virtual void OnClickEvent(MouseButton button)
     {
-        EventHandler handler = ClickEvent;
+        EventHandler<OnClickEventArgs> handler = ClickEvent;
         handler?.Invoke(this, new OnClickEventArgs(button));
     }
     
@@ -135,7 +132,7 @@ public class GridTile : Clickable
     
     protected virtual void OnFlagEvent(bool flagged)
     {
-        EventHandler handler = FlagEvent;
+        EventHandler<OnFlagEventArgs> handler = FlagEvent;
         handler?.Invoke(this, new OnFlagEventArgs(flagged));
     }
 
