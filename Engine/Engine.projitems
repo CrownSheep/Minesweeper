@@ -51,5 +51,9 @@
 	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/GridTile.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/TopSectionManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\Input\Touch\TouchManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TCP\NgrokShortCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TCP\TCPClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TCP\TCPServer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TCP\TileUpdate.cs" />
   </ItemGroup>
  </Project>

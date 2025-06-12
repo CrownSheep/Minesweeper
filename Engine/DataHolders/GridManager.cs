@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Minesweeper.Entities;
 using Minesweeper.Extensions;
 using Minesweeper.Particles;
 using Minesweeper.System;
@@ -12,6 +13,7 @@ public sealed class GridManager
 {
     public readonly Timer celebrationParticleTimer = new Timer(0.5f, true);
     public GridTile[,] Grid { get; private set; }
+    public GridTile this[int xindex, int yindex] => Grid[xindex, yindex];
 
     private bool initialTile = true;
 
@@ -26,7 +28,6 @@ public sealed class GridManager
     public event EventHandler LoseEvent;
 
     public int FlagCount => flagTiles.Count;
-    public GridTile this[int xindex, int yindex] => Grid[xindex, yindex];
 
     private Main game;
 
@@ -171,17 +172,20 @@ public sealed class GridManager
         var button = e.Button;
         var userClick = e.UserClick;
 
-        if (button == MouseButton.Left)
+        switch (button)
         {
-            HandleLeftClick(clickedTile, userClick);
-        }
-        else if (button == MouseButton.Right)
-        {
-            HandleRightClick(clickedTile);
+            case MouseButton.Left:
+                HandleLeftClick(clickedTile, userClick);
+                GameManager.client.SendUpdate(clickedTile.xIndex, clickedTile.yIndex, TileUpdate.TileState.Revealed, userClick);
+                break;
+            case MouseButton.Right:
+                HandleRightClick(clickedTile);
+                GameManager.client.SendUpdate(clickedTile.xIndex, clickedTile.yIndex, TileUpdate.TileState.Flagged, userClick);
+                break;
         }
     }
 
-    private void HandleLeftClick(GridTile tile, bool userClick)
+    public void HandleLeftClick(GridTile tile, bool userClick)
     {
         OnClickEvent(tile, MouseButton.Left);
         if (RevealedBombs || tile.Flagged) return;
@@ -217,7 +221,7 @@ public sealed class GridManager
         }
     }
 
-    private void HandleRightClick(GridTile tile)
+    public void HandleRightClick(GridTile tile)
     {
         if (!tile.IsHidden() || RevealedBombs) return;
 

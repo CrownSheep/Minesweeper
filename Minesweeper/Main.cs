@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -47,6 +48,7 @@ public class Main : Game
     private Texture2D spriteSheetTexture;
     private Texture2D transSpriteSheetTexture;
     private SpriteFont font;
+    public static TcpServer server;
 
     public Matrix TransformMatrix
     {
@@ -103,7 +105,7 @@ public class Main : Game
     protected override void Initialize()
     {
         base.Initialize();
-
+        
         Window.Title = GAME_TITLE;
 
         graphics.IsFullScreen = Environment == GameEnvironments.Android;
@@ -113,6 +115,9 @@ public class Main : Game
         graphics.ApplyChanges();
 
         Globals.Content = Content;
+        
+        // server = new TcpServer(5000);
+        // server.Start();
     }
 
 
@@ -138,18 +143,18 @@ public class Main : Game
 
         Globals.Update(gameTime);
         ParticleManager.Update(gameTime);
-
+        
         gameManager.Update(gameTime);
         
         MouseManager.Update();
         KeyboardManager.Update();
         TouchManager.Update();
+        
 
         if (KeyboardManager.WasKeyDown(Keys.F12))
         {
             ToggleDisplayMode();
         }
-
 
         base.Update(gameTime);
     }
