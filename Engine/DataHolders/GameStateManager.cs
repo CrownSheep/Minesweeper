@@ -12,24 +12,11 @@ using Swipe.Android.System.Input.Touch;
 
 namespace Minesweeper.DataHolders;
 
-public class GameStateManager : Clickable
+public class GameStateManager(Main game, Vector2 position, int width, int height, Action restartAction)
+    : Clickable(game, position, width, height)
 {
     public const int SPRITE_WIDTH = 24;
     public const int SPRITE_HEIGHT = 24;
-    
-    private GameStateSprite PlayingSprite => new(0);
-    
-    private GameStateSprite HeldPlayingSprite => new(1);
-    private GameStateSprite HeldSprite => new(2);
-    private GameStateSprite WinSprite => new(3);
-    private GameStateSprite LoseSprite => new(4);
-
-    private Action restartAction;
-    
-    public GameStateManager(Main game, Vector2 position, int width, int height, Action restartAction) : base(game, position, width, height)
-    {
-        this.restartAction = restartAction;
-    }
 
     protected override void OnLeftMouseClick()
     {
@@ -46,20 +33,16 @@ public class GameStateManager : Clickable
     {
         if (CanInteract() && (MouseManager.IsCurrently(ButtonState.Pressed, MouseButton.Left) || TouchManager.HasIndex()))
         {
-            return HeldPlayingSprite;
-        }
-        
-        switch (state)
-        {
-            case GameState.Held:
-                return HeldSprite;
-            case GameState.Win:
-                return WinSprite;
-            case GameState.Lose:
-                return LoseSprite;
+            return GameStateSprite.HeldPlayingSprite;
         }
 
-        return PlayingSprite;
+        return state switch
+        {
+            GameState.Held => GameStateSprite.HeldSprite,
+            GameState.Win => GameStateSprite.WinSprite,
+            GameState.Lose => GameStateSprite.LoseSprite,
+            _ => GameStateSprite.PlayingSprite
+        };
     }
 
 }

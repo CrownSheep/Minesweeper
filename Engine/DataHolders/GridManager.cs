@@ -17,8 +17,6 @@ public sealed class GridManager
 
     private bool initialTile = true;
 
-    private readonly Random random;
-
     private readonly List<GridTile> bombTiles = new List<GridTile>();
     private readonly List<GridTile> flagTiles = new List<GridTile>();
 
@@ -37,7 +35,6 @@ public sealed class GridManager
     public GridManager(Main game, Vector2 position)
     {
         this.game = game;
-        random = new Random();
         Position = position;
         celebrationParticleTimer.FinishEvent += OnCelebrationParticleTimer;
     }
@@ -49,7 +46,7 @@ public sealed class GridManager
             GridTile[] aboveZ = Grid.Cast<GridTile>().Where(tile => tile.Index > 0).ToArray();
             if (aboveZ.Length > 0)
             {
-                GridTile tile = aboveZ[random.Next(0, aboveZ.Length)];
+                GridTile tile = aboveZ[Main.Random.Next(0, aboveZ.Length)];
                 ParticleManager.SpawnTileParticle(tile, true);
                 tile.Index = GridTile.EMPTY_INDEX;
             }
@@ -99,8 +96,8 @@ public sealed class GridManager
         int bombsPlaced = 0;
         while (bombsPlaced < Math.Clamp(bombCount, 0, tileCount - 1))
         {
-            int randX = random.Next(Config.width);
-            int randY = random.Next(Config.height);
+            int randX = Main.Random.Next(Config.width);
+            int randY = Main.Random.Next(Config.height);
             GridTile randTile = Grid[randX, randY];
 
             if (!randTile.IsBomb() &&
@@ -156,7 +153,7 @@ public sealed class GridManager
     public void Win()
     {
         GridTile[] nonBombTiles = Grid.Cast<GridTile>().Where(tile => !tile.IsBomb()).ToArray();
-        OnClickTile(nonBombTiles[random.Next(nonBombTiles.Length)], new OnClickEventArgs(MouseButton.Left));
+        OnClickTile(nonBombTiles[Main.Random.Next(nonBombTiles.Length)], new OnClickEventArgs(MouseButton.Left));
         foreach (GridTile tile in Grid)
         {
             if (tile.IsEmpty())
@@ -169,18 +166,16 @@ public sealed class GridManager
     private void OnClickTile(object sender, OnClickEventArgs e)
     {
         var clickedTile = (GridTile)sender;
-        var button = e.Button;
+        var button = e.Action;
         var userClick = e.UserClick;
 
         switch (button)
         {
             case MouseButton.Left:
                 HandleLeftClick(clickedTile, userClick);
-                GameManager.client.SendUpdate(clickedTile.xIndex, clickedTile.yIndex, TileUpdate.TileState.Revealed, userClick);
                 break;
             case MouseButton.Right:
                 HandleRightClick(clickedTile);
-                GameManager.client.SendUpdate(clickedTile.xIndex, clickedTile.yIndex, TileUpdate.TileState.Flagged, userClick);
                 break;
         }
     }

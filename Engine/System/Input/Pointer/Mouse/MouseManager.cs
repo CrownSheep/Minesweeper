@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Minesweeper.System.Input.Global;
 using static Microsoft.Xna.Framework.Input.Mouse;
 
 namespace Minesweeper.System.Input.Mouse;
@@ -8,6 +9,7 @@ namespace Minesweeper.System.Input.Mouse;
 public static class MouseManager
 {
     private const int SCROLL_UNIT = 120;
+    
     private static MouseState mouseState, oldMouseState;
 
     public static void Update()
@@ -16,15 +18,30 @@ public static class MouseManager
         mouseState = GetState();
     }
 
-    private static ButtonState GetButtonState(MouseButton button, bool old = false)
+    private static ButtonState GetButtonState(PointerAction action, bool old = false)
     {
-        return button switch
+        return action switch
         {
-            MouseButton.Left => old ? oldMouseState.LeftButton : mouseState.LeftButton,
-            MouseButton.Right => old ? oldMouseState.RightButton : mouseState.RightButton,
-            MouseButton.Middle => old ? oldMouseState.MiddleButton : mouseState.MiddleButton,
+            PointerAction.Primary => old ? oldMouseState.LeftButton : mouseState.LeftButton,
+            PointerAction.Secondary => old ? oldMouseState.RightButton : mouseState.RightButton,
+            PointerAction.Tertiary => old ? oldMouseState.MiddleButton : mouseState.MiddleButton,
             _ => old ? oldMouseState.LeftButton : mouseState.LeftButton
         };
+    }
+    
+    public static float GetMouseX()
+    {
+        return mouseState.X;
+    }
+    
+    public static float GetMouseY()
+    {
+        return mouseState.Y;
+    }
+    
+    public static Vector2 GetMousePosition()
+    {
+        return new Vector2(mouseState.X, mouseState.Y);
     }
 
     public static int GetScrollWheelValue()
@@ -62,7 +79,7 @@ public static class MouseManager
         };
     }
 
-    public static bool WasReleased(MouseButton button)
+    public static bool WasReleased(PointerAction button)
     {
         ButtonState buttonState = GetButtonState(button);
         ButtonState oldButtonState = GetButtonState(button, true);
@@ -70,7 +87,7 @@ public static class MouseManager
         return buttonState == ButtonState.Released && oldButtonState == ButtonState.Pressed;
     }
 
-    public static bool WasClicked(MouseButton button)
+    public static bool WasClicked(PointerAction button)
     {
         ButtonState buttonState = GetButtonState(button);
         ButtonState oldButtonState = GetButtonState(button, true);
@@ -78,12 +95,12 @@ public static class MouseManager
         return buttonState == ButtonState.Pressed && oldButtonState == ButtonState.Released;
     }
     
-    public static bool IsCurrently(ButtonState buttonState, MouseButton button)
+    public static bool IsCurrently(ButtonState buttonState, PointerAction button)
     {        
         return GetButtonState(button) == buttonState;
     }
     
-    public static bool Hover(Rectangle bounds)
+    public static bool Inside(Rectangle bounds)
     {
         return bounds.Contains(new Vector2(mouseState.X, mouseState.Y));
     }

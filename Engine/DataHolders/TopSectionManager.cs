@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.System;
+using Minesweeper.System.Input.Global;
 
 namespace Minesweeper.DataHolders;
 
@@ -69,7 +70,7 @@ public class TopSectionManager
     {
         GridTile tile = (GridTile) sender;
         OnClickEventArgs clickEventArgs = (OnClickEventArgs) e;
-        if (clickEventArgs.Button == MouseButton.Left)
+        if (clickEventArgs.Action == PointerAction.Primary)
         {
             if(gridManager.RevealedBombs)
                 return;

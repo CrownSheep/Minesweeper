@@ -1,12 +1,13 @@
 ﻿using System.Linq;
 using Microsoft.Xna.Framework;
 using Minesweeper.System;
+using Minesweeper.System.Input.Global;
 using Minesweeper.System.Input.Mouse;
 using Swipe.Android.System.Input.Touch;
 
 namespace Minesweeper.Entities;
 
-public abstract class Clickable(Main game, Vector2 position, int width, int height, params MouseButton[] instantButtons)
+public abstract class Clickable(Main game, Vector2 position, int width, int height)
 {
     public Vector2 Position { get; } = position;
     public int Width { get; } = width;
@@ -20,8 +21,8 @@ public abstract class Clickable(Main game, Vector2 position, int width, int heig
     public virtual void Update(GameTime gameTime)
     {
         if (!game.IsActive) return;
-
-        if (!(MouseManager.Hover(Bounds) || TouchManager.Inside(Bounds))) return;
+        
+        if (!CanInteract()) return;
 
         if (CheckClick(MouseButton.Left))
             OnLeftMouseClick();
@@ -31,23 +32,23 @@ public abstract class Clickable(Main game, Vector2 position, int width, int heig
             OnMiddleMouseClick();
     }
 
-    private bool CheckClick(MouseButton button)
+    private bool CheckClick(PointerAction action)
     {
-        bool mobileClicked = button switch
+        bool mobileClicked = action switch
         {
             MouseButton.Left => TouchManager.WasReleased(),
             MouseButton.Right => TouchManager.HeldOver(),
             _ => false
         };
         
-        return (instantButtons.Contains(button)
-            ? MouseManager.WasClicked(button)
-            : MouseManager.WasReleased(button)) || mobileClicked;
+        return (instantButtons.Contains(action)
+            ? MouseManager.WasClicked(action)
+            : MouseManager.WasReleased(action)) || mobileClicked;
     }
 
     protected bool CanInteract()
     {
-        return game.IsActive && (MouseManager.Hover(Bounds) || TouchManager.Inside(Bounds));
+        return game.IsActive && (MouseManager.Inside(Bounds) || TouchManager.Inside(Bounds));
     }
 
     protected virtual void OnLeftMouseClick()

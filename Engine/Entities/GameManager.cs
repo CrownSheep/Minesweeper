@@ -31,11 +31,6 @@ public class GameManager
     private GameStateManager gameStateManager;
     
     public Main game;
-    
-    public Queue<TileUpdate> PendingUpdates = new Queue<TileUpdate>();
-    
-    public static TCPClient client;
-    
 
     public GameManager(Main game, Texture2D spriteSheet, GameConfig config)
     {
@@ -50,8 +45,6 @@ public class GameManager
         topSectionManager = new TopSectionManager(game, gridManager);
         gameStateManager = new GameStateManager(game, new Vector2(game.WindowWidth / 2 - GameStateManager.SPRITE_WIDTH / 2, topSectionFrame.Y + 16),
             GameStateManager.SPRITE_WIDTH, GameStateManager.SPRITE_HEIGHT, topSectionManager.ResetTime);
-        
-        client = new TCPClient(this);
     }
 
     public void OnLose(object sender, EventArgs args)
@@ -67,25 +60,6 @@ public class GameManager
 
     public void Update(GameTime gameTime)
     {
-        lock (PendingUpdates)
-        {
-            while (PendingUpdates.Count > 0)
-            {
-                TileUpdate update = PendingUpdates.Dequeue();
-                switch (update.State)
-                {
-                    case TileUpdate.TileState.Revealed:
-                        gridManager.HandleLeftClick(gridManager[update.X, update.Y], update.User);
-                        break;
-                    case TileUpdate.TileState.Flagged:
-                        gridManager.HandleRightClick(gridManager[update.X, update.Y]);
-                        break;
-                }
-
-                Console.WriteLine($"Dequeued update: {update.State} at ({update.X}, {update.Y})");
-            }
-        }
-        
         topSectionManager.timer.Tick(gameTime);
         topSectionManager.Update();
 

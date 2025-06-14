@@ -41,14 +41,19 @@ public class Main : Game
 
     public int WindowWidth => Config.width * GridTile.TILE_WIDTH + 20;
     public int WindowHeight => 56 + Config.height * GridTile.TILE_HEIGHT + 10;
+    
+    public static Random Random { get; private set; }
+    public static int Seed { get; private set;}
 
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
 
     private Texture2D spriteSheetTexture;
     private Texture2D transSpriteSheetTexture;
+    
     private SpriteFont font;
-    public static TcpServer server;
+    
+    public static TCPClient client;
 
     public Matrix TransformMatrix
     {
@@ -75,7 +80,9 @@ public class Main : Game
             bool vertical = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width <
                             GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             return Environment == GameEnvironments.Desktop
-                ? GameConfig.Beginner
+                ?  new GameConfig(9,
+                    16,
+                    21, false)
                 : new GameConfig(vertical ? 9 : 16,
                     vertical ? 16 : 9,
                     21, false);
@@ -116,8 +123,8 @@ public class Main : Game
 
         Globals.Content = Content;
         
-        // server = new TcpServer(5000);
-        // server.Start();
+        Seed = global::System.Environment.TickCount;
+        Random = new Random(Seed);
     }
 
 
@@ -133,6 +140,8 @@ public class Main : Game
 
         LoadGameWithConfig(DefaultConfig);
         gameManager = new GameManager(this, spriteSheetTexture, Config);
+        
+        client = new TCPClient();
     }
 
     protected override void Update(GameTime gameTime)
@@ -150,7 +159,6 @@ public class Main : Game
         KeyboardManager.Update();
         TouchManager.Update();
         
-
         if (KeyboardManager.WasKeyDown(Keys.F12))
         {
             ToggleDisplayMode();

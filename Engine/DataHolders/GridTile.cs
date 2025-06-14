@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.Entities;
 using Minesweeper.System;
+using Minesweeper.System.Input.Global;
 using Minesweeper.System.Input.Mouse;
 using Swipe.Android.System.Input.Touch;
 
@@ -38,7 +39,7 @@ public class GridTile : Clickable
     public Vector2 gridPosition;
 
     public GridTile(Main game, Vector2 position, int width, int height, int xIndex, int yIndex) : base(game, position,
-        width, height, MouseButton.Right)
+        width, height, PointerAction.Secondary)
     {
         this.xIndex = xIndex;
         this.yIndex = yIndex;
@@ -74,7 +75,7 @@ public class GridTile : Clickable
             }
             else
             {
-                if(MouseManager.WasReleased(MouseButton.Left))
+                if(MouseManager.WasReleased(PointerAction.Primary))
                     game.GameState = GameState.Playing;
                 
                 ShowHeld = false;
@@ -89,14 +90,14 @@ public class GridTile : Clickable
     {
         if (game.GameState is GameState.Lose or GameState.Win) return;
         
-        OnClickEvent(MouseButton.Left);
+        OnClickEvent(PointerAction.Primary);
     }
     
     protected override void OnRightMouseClick()
     {
         if (game.GameState is GameState.Lose or GameState.Win) return;
         
-        OnClickEvent(MouseButton.Right);
+        OnClickEvent(PointerAction.Secondary);
     }
     
     public void Flag()
@@ -107,21 +108,18 @@ public class GridTile : Clickable
 
     public void Reveal()
     {
-        if (!Flagged)
-        {
-            if (Hidden)
-            {
-                OnRevealEvent();
-            }
-        }
+        if (Flagged) return;
+        
+        if (Hidden)
+            OnRevealEvent();
     }
     
     
     
-    protected virtual void OnClickEvent(MouseButton button)
+    protected virtual void OnClickEvent(PointerAction action)
     {
         EventHandler<OnClickEventArgs> handler = ClickEvent;
-        handler?.Invoke(this, new OnClickEventArgs(button));
+        handler?.Invoke(this, new OnClickEventArgs(action));
     }
     
     protected virtual void OnRevealEvent()
@@ -148,36 +146,7 @@ public class GridTile : Clickable
     
     public static TileSprite GetSpriteByTile(GridTile tile)
     {
-        if (tile.Hidden)
-        {
-            if (tile.ShowHeld)
-                return emptySprite;
-
-            if (tile.Flagged)
-            {
-                if (!tile.IsBomb() && tile.IsBadFlagged)
-                {
-                    return badFlagSprite;
-                }
-
-                return flagSprite;
-            }
-
-            return hiddenSprite;
-        }
-
-        if (tile.ClickedBomb)
-            return clickedBombSprite;
-
-        switch (tile.Index)
-        {
-            case <= BOMB_INDEX:
-                return bombSprite;
-            case 0:
-                return emptySprite;
-        }
-
-        return new TileSprite(Globals.MainSpriteSheet, 0 + MathHelper.Clamp(tile.Index - 1, 0, 7), TILE_HEIGHT);
+        return GetSpriteByTileData(tile.Index, tile.Hidden, tile.Flagged, tile.ClickedBomb, tile.IsBadFlagged, tile.ShowHeld);
     }
     
     public static TileSprite GetSpriteByTileData(int index, bool hidden = false, bool flagged = false, bool clickedBomb = false, bool badFlagged = false, bool showHeld = false)
@@ -187,30 +156,24 @@ public class GridTile : Clickable
             if (showHeld)
                 return emptySprite;
 
-            if (flagged)
+            if (!flagged) return hiddenSprite;
+            if (index != BOMB_INDEX && badFlagged)
             {
-                if (index != BOMB_INDEX && badFlagged)
-                {
-                    return badFlagSprite;
-                }
-
-                return flagSprite;
+                return badFlagSprite;
             }
 
-            return hiddenSprite;
+            return flagSprite;
+
         }
 
         if (clickedBomb)
             return clickedBombSprite;
 
-        switch (index)
+        return index switch
         {
-            case <= BOMB_INDEX:
-                return bombSprite;
-            case 0:
-                return emptySprite;
-        }
-
-        return new TileSprite(Globals.MainSpriteSheet, 0 + MathHelper.Clamp(index - 1, 0, 7), TILE_HEIGHT);
+            <= BOMB_INDEX => bombSprite,
+            0 => emptySprite,
+            _ => new TileSprite(Globals.MainSpriteSheet, 0 + MathHelper.Clamp(index - 1, 0, 7), TILE_HEIGHT)
+        };
     }
 }

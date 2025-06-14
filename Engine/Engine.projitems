@@ -21,9 +21,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)OnClickEventArgs.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)OnFlagEventArgs.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)System/Timer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Mouse\MouseButton.cs" />
-	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Mouse/MouseManager.cs" />
-	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Mouse/ScrollDirection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Pointer\PointerAction.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Pointer\PointerInput.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Keyboard/KeyboardManager.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Keyboard/MultiKey.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)Particles/Particle.cs" />
@@ -50,10 +49,8 @@
 	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/GridManager.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/GridTile.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/TopSectionManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Touch\TouchManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TCP\NgrokAddress.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TCP\NgrokShortCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TCP\TCPClient.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TCP\TCPServer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TCP\TileUpdate.cs" />
   </ItemGroup>
  </Project>
