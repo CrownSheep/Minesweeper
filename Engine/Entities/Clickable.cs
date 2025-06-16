@@ -1,9 +1,5 @@
-﻿using System.Linq;
-using Microsoft.Xna.Framework;
-using Minesweeper.System;
+﻿using Microsoft.Xna.Framework;
 using Minesweeper.System.Input.Global;
-using Minesweeper.System.Input.Mouse;
-using Swipe.Android.System.Input.Touch;
 
 namespace Minesweeper.Entities;
 
@@ -21,46 +17,33 @@ public abstract class Clickable(Main game, Vector2 position, int width, int heig
     public virtual void Update(GameTime gameTime)
     {
         if (!game.IsActive) return;
+
+        Vector2 primaryPosition = PointerInput.GetPosition(PointerAction.Primary);
+        Vector2 secondaryPosition = PointerInput.GetPosition(PointerAction.Secondary);
+        Vector2 tertiaryPosition = PointerInput.GetPosition(PointerAction.Tertiary);
         
-        if (!CanInteract()) return;
-
-        if (CheckClick(MouseButton.Left))
-            OnLeftMouseClick();
-        if (CheckClick(MouseButton.Right))
-            OnRightMouseClick();
-        if (CheckClick(MouseButton.Middle))
-            OnMiddleMouseClick();
+        OnPrimaryAction(primaryPosition, PointerInput.GetPointerState(PointerAction.Primary));
+        OnSecondaryAction(secondaryPosition, PointerInput.GetPointerState(PointerAction.Secondary));
+        OnTertiaryAction(tertiaryPosition, PointerInput.GetPointerState(PointerAction.Tertiary));
     }
 
-    private bool CheckClick(PointerAction action)
+    protected bool InBounds()
     {
-        bool mobileClicked = action switch
-        {
-            MouseButton.Left => TouchManager.WasReleased(),
-            MouseButton.Right => TouchManager.HeldOver(),
-            _ => false
-        };
-        
-        return (instantButtons.Contains(action)
-            ? MouseManager.WasClicked(action)
-            : MouseManager.WasReleased(action)) || mobileClicked;
+        return PointerInput.Inside(Bounds);
     }
 
-    protected bool CanInteract()
-    {
-        return game.IsActive && (MouseManager.Inside(Bounds) || TouchManager.Inside(Bounds));
-    }
-
-    protected virtual void OnLeftMouseClick()
-    {
-    }
-
-    protected virtual void OnRightMouseClick()
+    protected virtual void OnPrimaryAction(Vector2 position, PointerState state)
     {
         
     }
 
-    protected virtual void OnMiddleMouseClick()
+    protected virtual void OnSecondaryAction(Vector2 position, PointerState state)
     {
+        
+    }
+
+    protected virtual void OnTertiaryAction(Vector2 position, PointerState state)
+    {
+        
     }
 }

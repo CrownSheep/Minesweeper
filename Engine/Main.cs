@@ -1,19 +1,12 @@
-﻿#nullable enable
-using System;
-using System.Threading.Tasks;
+﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
 using Minesweeper.DataHolders;
 using Minesweeper.Entities;
-using Minesweeper.Extensions;
 using Minesweeper.Particles;
-using Minesweeper.System;
+using Minesweeper.System.Input.Global;
 using Minesweeper.System.Input.Keyboard;
-using Minesweeper.System.Input.Mouse;
-using MonoGame.Framework.Utilities;
-using Swipe.Android.System.Input.Touch;
 
 namespace Minesweeper;
 
@@ -23,12 +16,6 @@ public class Main : Game
     {
         Default,
         Zoomed
-    }
-
-    public interface IAndroidService
-    {
-        void Vibrate(long milliseconds, int amplitude = 1);
-        void ConsoleLog(string? prefix, string message);
     }
 
     private const string GAME_TITLE = "Minesweeper";
@@ -46,14 +33,16 @@ public class Main : Game
     public static int Seed { get; private set;}
 
     private GraphicsDeviceManager graphics;
-    private SpriteBatch spriteBatch;
+    private SpriteBatch spriteBatch = null!;
 
-    private Texture2D spriteSheetTexture;
-    private Texture2D transSpriteSheetTexture;
+    private Texture2D spriteSheetTexture = null!;
+    private Texture2D transSpriteSheetTexture = null!;
     
-    private SpriteFont font;
+    private SpriteFont font = null!;
     
     public static TCPClient client;
+    
+    public static IAndroidService androidService;
 
     public Matrix TransformMatrix
     {
@@ -71,7 +60,7 @@ public class Main : Game
 
     private Matrix? transformMatrix;
 
-    private GameManager gameManager;
+    private GameManager gameManager = null!;
 
     private GameConfig DefaultConfig
     {
@@ -89,7 +78,7 @@ public class Main : Game
         }
     }
 
-    public GameConfig Config { get; private set; }
+    public GameConfig Config { get; private set; } = null!;
     public GameState GameState { get; set; }
     public GameEnvironments Environment { get; set; }
     public DisplayMode WindowDisplayMode { get; set; } = DisplayMode.Default;
@@ -98,24 +87,25 @@ public class Main : Game
         ? Environment == GameEnvironments.Desktop ? DESKTOP_DEFAULT_ZOOM_FACTOR : ANDROID_DEFAULT_ZOOM_FACTOR
         : DISPLAY_ZOOM_FACTOR;
 
-    public Main(GameEnvironments env = GameEnvironments.Desktop, IAndroidService androidService = null)
+    public Main(GameEnvironments environment, IAndroidService? service = null)
     {
         graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
-        if(androidService != null)
-            Android.Service = androidService;
-        
-        Environment = env;
+        androidService = service ?? new IncompatibleAndroidService();
+
+        Environment = environment;
     }
 
     protected override void Initialize()
     {
         base.Initialize();
         
+        client = new TCPClient();
+        
         Window.Title = GAME_TITLE;
 
-        graphics.IsFullScreen = Environment == GameEnvironments.Android;
+        graphics.IsFullScreen = Environment == GameEnvironments.Mobile;
         RefreshWindowDimensions();
         graphics.SynchronizeWithVerticalRetrace = true;
         graphics.SupportedOrientations = DisplayOrientation.Portrait;
@@ -140,8 +130,6 @@ public class Main : Game
 
         LoadGameWithConfig(DefaultConfig);
         gameManager = new GameManager(this, spriteSheetTexture, Config);
-        
-        client = new TCPClient();
     }
 
     protected override void Update(GameTime gameTime)
@@ -156,8 +144,9 @@ public class Main : Game
         gameManager.Update(gameTime);
         
         MouseManager.Update();
-        KeyboardManager.Update();
         TouchManager.Update();
+        PointerInput.Update();
+        KeyboardManager.Update();
         
         if (KeyboardManager.WasKeyDown(Keys.F12))
         {

@@ -3,8 +3,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
 using Minesweeper.System.Input.Global;
 
-namespace Swipe.Android.System.Input.Touch;
-
 public static class TouchManager
 {
     private const int SECONDARY_CLICK_TIME = 200;
@@ -30,7 +28,7 @@ public static class TouchManager
 
     public static Vector2 GetFingerPosition(int fingerIndex = 0)
     {
-        return !HasIndex(fingerIndex) ? Vector2.Zero : touch[fingerIndex].Position;
+        return !HasFinger(fingerIndex) ? Vector2.Zero : touch[fingerIndex].Position;
     }
 
     public static float GetFingerX(int fingerIndex = 0)
@@ -45,7 +43,7 @@ public static class TouchManager
 
     public static bool WasReleased(PointerAction action, int fingerIndex = 0)
     {
-        if(!HasIndex(fingerIndex))
+        if(!HasFinger(fingerIndex))
             return false;
         
         return action switch
@@ -58,7 +56,7 @@ public static class TouchManager
 
     public static bool WasClicked(PointerAction action, int fingerIndex = 0)
     {
-        if(!HasIndex(fingerIndex))
+        if(!HasFinger(fingerIndex))
             return false;
 
         return action switch
@@ -71,7 +69,7 @@ public static class TouchManager
 
     private static bool HeldOver(int fingerIndex = 0, int time = SECONDARY_CLICK_TIME)
     {
-        if (!HasIndex(fingerIndex))
+        if (!HasFinger(fingerIndex))
         {
             stillHeldOver = false;
             return false;
@@ -90,19 +88,19 @@ public static class TouchManager
         return true;
     }
     
-    private static bool HasIndex(TouchCollection panel, int fingerIndex = 0)
+    private static bool HasFinger(TouchCollection panel, int fingerIndex = 0)
     {
         return panel.Count >= fingerIndex + 1;
     }
 
-    public static bool HasIndex(int fingerIndex = 0)
+    public static bool HasFinger(int fingerIndex = 0)
     {
-        return HasIndex(touch, fingerIndex);
+        return HasFinger(touch, fingerIndex);
     }
 
     public static bool Inside(Rectangle bounds, int fingerIndex = 0)
     {
-        if(!HasIndex(fingerIndex))
+        if(!HasFinger(fingerIndex))
             return false;
         
         Rectangle rect = new Rectangle(bounds.X, bounds.Y, bounds.Width, bounds.Height);

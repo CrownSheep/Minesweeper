@@ -2,9 +2,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.System.Input.Global;
+using Minesweeper.System.Input.Mouse;
 using static Microsoft.Xna.Framework.Input.Mouse;
-
-namespace Minesweeper.System.Input.Mouse;
 
 public static class MouseManager
 {
@@ -18,7 +17,7 @@ public static class MouseManager
         mouseState = GetState();
     }
 
-    private static ButtonState GetButtonState(PointerAction action, bool old = false)
+    public static ButtonState GetButtonState(PointerAction action, bool old = false)
     {
         return action switch
         {
@@ -95,9 +94,9 @@ public static class MouseManager
         return buttonState == ButtonState.Pressed && oldButtonState == ButtonState.Released;
     }
     
-    public static bool IsCurrently(ButtonState buttonState, PointerAction button)
+    public static bool IsCurrently(ButtonState buttonState, PointerAction button, bool old = false)
     {        
-        return GetButtonState(button) == buttonState;
+        return GetButtonState(button, old) == buttonState;
     }
     
     public static bool Inside(Rectangle bounds)

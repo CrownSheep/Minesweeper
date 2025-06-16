@@ -2,14 +2,13 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.Entities;
-using Minesweeper.System;
 using Minesweeper.System.Input.Global;
-using Minesweeper.System.Input.Mouse;
-using Swipe.Android.System.Input.Touch;
 
 namespace Minesweeper.DataHolders;
 
-public class GridTile : Clickable
+public sealed class GridTile(Main game, Vector2 position, int width, int height, int xIndex, int yIndex)
+    : Clickable(game, position,
+        width, height)
 {
     public const int TILE_WIDTH = 18;
     public const int TILE_HEIGHT = 18;
@@ -23,32 +22,20 @@ public class GridTile : Clickable
     private static readonly TileSprite bombSprite = new(Globals.MainSpriteSheet, 5);
     private static readonly TileSprite clickedBombSprite = new(Globals.MainSpriteSheet, 6);
     private static readonly TileSprite badFlagSprite = new(Globals.MainSpriteSheet, 7);
-    public int Index { get; set; }
-    public bool Hidden { get; set; }
+    public int Index { get; set; } = 0;
+    public bool Hidden { get; set; } = true;
     public bool ShowHeld { get; set; }
-    public bool Flagged { get; set; }
+    public bool Flagged { get; set; } = false;
     public bool IsBadFlagged { get; set; }
     public bool ClickedBomb { get; set; }
     public event EventHandler<OnClickEventArgs> ClickEvent;
     public event EventHandler<OnFlagEventArgs> FlagEvent;
     public event EventHandler RevealEvent;
 
-    public int xIndex;
-    public int yIndex;
+    public int xIndex = xIndex;
+    public int yIndex = yIndex;
 
-    public Vector2 gridPosition;
-
-    public GridTile(Main game, Vector2 position, int width, int height, int xIndex, int yIndex) : base(game, position,
-        width, height, PointerAction.Secondary)
-    {
-        this.xIndex = xIndex;
-        this.yIndex = yIndex;
-        gridPosition = new Vector2(xIndex, yIndex);
-        
-        Index = 0;
-        Hidden = true;
-        Flagged = false;
-    }
+    public Vector2 gridPosition = new(xIndex, yIndex);
 
     public void SetIndex(int index)
     {
@@ -86,15 +73,21 @@ public class GridTile : Clickable
     }
 
 
-    protected override void OnLeftMouseClick()
+    protected override void OnPrimaryAction(Vector2 position, PointerState state)
     {
+        if (!InBounds()) return;
+        if (state != PointerState.Released) return;
+        
         if (game.GameState is GameState.Lose or GameState.Win) return;
         
         OnClickEvent(PointerAction.Primary);
     }
     
-    protected override void OnRightMouseClick()
+    protected override void OnSecondaryAction(Vector2 position, PointerState state)
     {
+        if (!InBounds()) return;
+        if (state != PointerState.Down) return;
+        
         if (game.GameState is GameState.Lose or GameState.Win) return;
         
         OnClickEvent(PointerAction.Secondary);
@@ -113,22 +106,21 @@ public class GridTile : Clickable
         if (Hidden)
             OnRevealEvent();
     }
-    
-    
-    
-    protected virtual void OnClickEvent(PointerAction action)
+
+
+    private void OnClickEvent(PointerAction action)
     {
         EventHandler<OnClickEventArgs> handler = ClickEvent;
         handler?.Invoke(this, new OnClickEventArgs(action));
     }
-    
-    protected virtual void OnRevealEvent()
+
+    private void OnRevealEvent()
     {
         EventHandler handler = RevealEvent;
         handler?.Invoke(this, EventArgs.Empty);
     }
-    
-    protected virtual void OnFlagEvent(bool flagged)
+
+    private void OnFlagEvent(bool flagged)
     {
         EventHandler<OnFlagEventArgs> handler = FlagEvent;
         handler?.Invoke(this, new OnFlagEventArgs(flagged));

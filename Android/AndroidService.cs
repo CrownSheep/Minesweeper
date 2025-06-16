@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace Minesweeper.Android;
 
-public class AndroidService : Main.IAndroidService
+public class AndroidService : IAndroidService
 {
     public void Vibrate(long milliseconds, int amplitude = 1)
     {

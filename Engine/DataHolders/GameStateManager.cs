@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Drawing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.Entities;
-using Minesweeper.Extensions;
 using Minesweeper.Graphics;
 using Minesweeper.Particles;
-using Minesweeper.System;
-using Minesweeper.System.Input.Mouse;
-using Swipe.Android.System.Input.Touch;
+using Minesweeper.System.Input.Global;
 
 namespace Minesweeper.DataHolders;
 
@@ -18,8 +14,11 @@ public class GameStateManager(Main game, Vector2 position, int width, int height
     public const int SPRITE_WIDTH = 24;
     public const int SPRITE_HEIGHT = 24;
 
-    protected override void OnLeftMouseClick()
+    protected override void OnPrimaryAction(Vector2 position, PointerState state)
     {
+        if (!InBounds()) return;
+        if (state != PointerState.Released) return;
+        
         game.LoadGameWithConfig(game.Config);
         game.GameState = GameState.Playing;
         restartAction.Invoke();
@@ -31,7 +30,7 @@ public class GameStateManager(Main game, Vector2 position, int width, int height
 
     public GameStateSprite GetSpriteByGameState(GameState state)
     {
-        if (CanInteract() && (MouseManager.IsCurrently(ButtonState.Pressed, MouseButton.Left) || TouchManager.HasIndex()))
+        if (InBounds() && (MouseManager.IsCurrently(ButtonState.Pressed, PointerAction.Primary) || TouchManager.HasFinger()))
         {
             return GameStateSprite.HeldPlayingSprite;
         }

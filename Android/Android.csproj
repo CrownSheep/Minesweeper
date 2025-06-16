@@ -7,6 +7,8 @@
         <ApplicationId>dev.crownsheep.Minesweeper</ApplicationId>
         <ApplicationVersion>1</ApplicationVersion>
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <RootNamespace>Minesweeper.Android</RootNamespace>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4" />
@@ -28,4 +30,5 @@
         <Message Text="Restoring dotnet tools" Importance="High"/>
         <Exec Command="dotnet tool restore"/>
     </Target>
+    <Import Project="..\Engine\Engine.projitems" Label="Shared" />
 </Project>

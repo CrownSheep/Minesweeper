@@ -19,12 +19,19 @@ public class TCPClient
         string ngrokAddress = "4.tcp.eu.ngrok.io:16631";
         NgrokAddress address = new NgrokAddress(ngrokAddress);
 
-        client = new TcpClient(address.Host, address.Port);
-        stream = client.GetStream();
-        reader = new StreamReader(stream);
-        writer = new StreamWriter(stream) { AutoFlush = true };
+        try
+        {
+            client = new TcpClient(address.Host, address.Port);
+            stream = client.GetStream();
+            reader = new StreamReader(stream);
+            writer = new StreamWriter(stream) { AutoFlush = true };
         
-        Task.Run(ListenLoop);
+            Task.Run(ListenLoop);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Server not running!");
+        }
     }
 
     public void SendClick(float x, float y, PointerAction action)

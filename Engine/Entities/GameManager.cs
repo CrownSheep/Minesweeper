@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.DataHolders;
 using Minesweeper.Extensions;
 using Minesweeper.System.Input.Keyboard;
-using Swipe.Android.System.Input.Touch;
 
 namespace Minesweeper.Entities;
 
@@ -50,7 +48,7 @@ public class GameManager
     public void OnLose(object sender, EventArgs args)
     {
         topSectionManager.timer.SetPaused(true);
-        Android.Service.Vibrate(600, -1);
+        Main.androidService.Vibrate(600, -1);
     }
     
     public void OnWin(object sender, EventArgs args)

@@ -3,13 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minesweeper.Desktop", "Minesweeper.Desktop\Minesweeper.Desktop.csproj", "{963B7783-6286-43C2-9B7D-46E04136BF17}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Minesweeper", "Minesweeper\Minesweeper.csproj", "{5847F651-06D7-49FF-B32A-FF8C2DE68362}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Desktop", "Desktop\Desktop.csproj", "{963B7783-6286-43C2-9B7D-46E04136BF17}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Engine", "Engine\Engine.shproj", "{A0CDBD0E-3A41-42B7-9425-A838BC2C7383}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minesweeper.Android", "Minesweeper.Android\Minesweeper.Android.csproj", "{5467985A-B63A-495A-8BE0-4A5B38E0E751}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Android", "Android\Android.csproj", "{5467985A-B63A-495A-8BE0-4A5B38E0E751}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{4ADE54AF-1EB9-4A31-AC0D-24759C476E22}"
 EndProject
@@ -23,10 +21,6 @@ Global
 		{963B7783-6286-43C2-9B7D-46E04136BF17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{963B7783-6286-43C2-9B7D-46E04136BF17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{963B7783-6286-43C2-9B7D-46E04136BF17}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5847F651-06D7-49FF-B32A-FF8C2DE68362}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5847F651-06D7-49FF-B32A-FF8C2DE68362}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5847F651-06D7-49FF-B32A-FF8C2DE68362}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5847F651-06D7-49FF-B32A-FF8C2DE68362}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5467985A-B63A-495A-8BE0-4A5B38E0E751}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5467985A-B63A-495A-8BE0-4A5B38E0E751}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5467985A-B63A-495A-8BE0-4A5B38E0E751}.Release|Any CPU.ActiveCfg = Release|Any CPU

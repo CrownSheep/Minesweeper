@@ -6,6 +6,7 @@ using Minesweeper.Entities;
 using Minesweeper.Extensions;
 using Minesweeper.Particles;
 using Minesweeper.System;
+using Minesweeper.System.Input.Global;
 
 namespace Minesweeper.DataHolders;
 
@@ -112,10 +113,10 @@ public sealed class GridManager
         initialTile = false;
     }
 
-    private void OnClickEvent(GridTile tile, MouseButton button)
+    private void OnClickEvent(GridTile tile, PointerAction action)
     {
         EventHandler handler = ClickEvent;
-        handler?.Invoke(tile, new OnClickEventArgs(button));
+        handler?.Invoke(tile, new OnClickEventArgs(action));
     }
 
     private void OnWinEvent()
@@ -153,12 +154,12 @@ public sealed class GridManager
     public void Win()
     {
         GridTile[] nonBombTiles = Grid.Cast<GridTile>().Where(tile => !tile.IsBomb()).ToArray();
-        OnClickTile(nonBombTiles[Main.Random.Next(nonBombTiles.Length)], new OnClickEventArgs(MouseButton.Left));
+        OnClickTile(nonBombTiles[Main.Random.Next(nonBombTiles.Length)], new OnClickEventArgs(PointerAction.Primary));
         foreach (GridTile tile in Grid)
         {
             if (tile.IsEmpty())
             {
-                OnClickTile(tile, new OnClickEventArgs(MouseButton.Left));
+                OnClickTile(tile, new OnClickEventArgs(PointerAction.Primary));
             }
         }
     }
@@ -171,10 +172,10 @@ public sealed class GridManager
 
         switch (button)
         {
-            case MouseButton.Left:
+            case PointerAction.Primary:
                 HandleLeftClick(clickedTile, userClick);
                 break;
-            case MouseButton.Right:
+            case PointerAction.Secondary:
                 HandleRightClick(clickedTile);
                 break;
         }
@@ -182,7 +183,7 @@ public sealed class GridManager
 
     public void HandleLeftClick(GridTile tile, bool userClick)
     {
-        OnClickEvent(tile, MouseButton.Left);
+        OnClickEvent(tile, PointerAction.Primary);
         if (RevealedBombs || tile.Flagged) return;
 
         if (initialTile)
@@ -220,7 +221,7 @@ public sealed class GridManager
     {
         if (!tile.IsHidden() || RevealedBombs) return;
 
-        Android.Service.Vibrate(100);
+        Main.androidService.Vibrate(100);
 
         if (tile.Flagged)
             ParticleManager.SpawnTileParticle(tile, true);
@@ -232,7 +233,7 @@ public sealed class GridManager
     {
         tile.Reveal();
         tile.SetIndex(AdjacentBombCount(tile));
-        RevealAdjacentEmptyTiles(tile, MouseButton.Left);
+        RevealAdjacentEmptyTiles(tile, PointerAction.Primary);
     }
 
     private void HandleLose(GridTile bombTile)
@@ -312,20 +313,20 @@ public sealed class GridManager
                     GridTile adjacentTile = Grid[adjacentX, adjacentY];
                     if (adjacentTile.IsHidden() && !adjacentTile.Flagged)
                     {
-                        if (game.Environment != GameEnvironments.Android)
+                        if (game.Environment != GameEnvironments.Mobile)
                             ParticleManager.SpawnTileParticle(adjacentTile, false);
                         
                         if (!adjacentTile.IsBomb())
                             adjacentTile.SetIndex(AdjacentBombCount(adjacentTile));
                         adjacentTile.Hidden = false;
-                        OnClickTile(adjacentTile, new OnClickEventArgs(MouseButton.Left, false));
+                        OnClickTile(adjacentTile, new OnClickEventArgs(PointerAction.Primary, false));
                     }
                 }
             }
         }
     }
 
-    private void RevealAdjacentEmptyTiles(GridTile clickedTile, MouseButton button)
+    private void RevealAdjacentEmptyTiles(GridTile clickedTile, PointerAction button)
     {
         int[] positions = { -1, 0, 1 };
         foreach (int xPosition in positions)
@@ -342,7 +343,7 @@ public sealed class GridManager
                     {
                         if (adjacentTile.IsEmpty() && adjacentTile.IsHidden() && !adjacentTile.Flagged)
                         {
-                            if (game.Environment != GameEnvironments.Android)
+                            if (game.Environment != GameEnvironments.Mobile)
                                 ParticleManager.SpawnTileParticle(adjacentTile, false);
                             
                             adjacentTile.SetIndex(AdjacentBombCount(adjacentTile));

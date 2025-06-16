@@ -9,18 +9,19 @@
     <Import_RootNamespace>Engine</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Content\" />
-  </ItemGroup>
-  <ItemGroup>
-    <MonoGameContentReference Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
-    <None Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
-  </ItemGroup>
-  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)GameEnvironments.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataHolders\OnClickEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataHolders\OnFlagEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Globals.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameState.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)OnClickEventArgs.cs" />
-	<Compile Include="$(MSBuildThisFileDirectory)OnFlagEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IAndroidService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IncompatibleAndroidService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Main.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)System/Timer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\InputNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Pointer\IInputSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Pointer\LocalInputAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Pointer\Mouse\MouseManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\Input\Pointer\PointerAction.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)System\Input\Pointer\PointerInput.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)System/Input/Keyboard/KeyboardManager.cs" />
@@ -49,8 +50,30 @@
 	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/GridManager.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/GridTile.cs" />
 	<Compile Include="$(MSBuildThisFileDirectory)DataHolders/TopSectionManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Pointer\PointerSnapshot.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Pointer\PointerState.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Pointer\ScrollDirection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Pointer\Touch\TouchManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Remote\RemoteInput.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Remote\RemoteInputAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Remote\RemotePointerBatch.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)System\Input\Remote\RemotePointerEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TCP\NgrokAddress.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TCP\NgrokShortCode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TCP\TCPClient.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Content\bin\DesktopGL\minesweeper_spritesheet.xnb" />
+    <None Include="$(MSBuildThisFileDirectory)Content\bin\DesktopGL\transparent_minesweeper_spritesheet.xnb" />
+    <None Include="$(MSBuildThisFileDirectory)Content\Content.mgcb" />
+    <None Include="$(MSBuildThisFileDirectory)Content\font.spritefont" />
+    <None Include="$(MSBuildThisFileDirectory)Content\Joystix.otf" />
+    <None Include="$(MSBuildThisFileDirectory)Content\obj\DesktopGL\.mgcontent" />
+    <None Include="$(MSBuildThisFileDirectory)Content\obj\DesktopGL\.mgstats" />
+    <None Include="$(MSBuildThisFileDirectory)Content\obj\DesktopGL\minesweeper_spritesheet.mgcontent" />
+    <None Include="$(MSBuildThisFileDirectory)Content\obj\DesktopGL\transparent_minesweeper_spritesheet.mgcontent" />
+    <None Include="$(MSBuildThisFileDirectory)Content\Retro Gaming.ttf" />
+    <None Include="$(MSBuildThisFileDirectory)Content\spritesheets\transparent_minesweeper_spritesheet.png" />
+    <None Include="$(MSBuildThisFileDirectory)Content\spritesheets\minesweeper_spritesheet.png" />
   </ItemGroup>
  </Project>

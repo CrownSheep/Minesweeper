@@ -24,7 +24,7 @@ namespace Minesweeper.Android
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
-            game = new Main(GameEnvironments.Android, new AndroidService());
+            game = new Main(GameEnvironments.Mobile, new AndroidService());
             view = game.Services.GetService(typeof(View)) as View;
 
             SetContentView(view);
