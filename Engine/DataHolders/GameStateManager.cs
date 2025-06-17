@@ -18,6 +18,8 @@ public class GameStateManager(Main game, Vector2 position, int width, int height
     {
         if (!InBounds()) return;
         if (state != PointerState.Released) return;
+
+        SendToRemote();
         
         game.LoadGameWithConfig(game.Config);
         game.GameState = GameState.Playing;

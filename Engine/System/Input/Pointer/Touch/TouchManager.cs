@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input.Touch;
+using Minesweeper;
 using Minesweeper.System.Input.Global;
 
 public static class TouchManager
@@ -28,7 +30,7 @@ public static class TouchManager
 
     public static Vector2 GetFingerPosition(int fingerIndex = 0)
     {
-        return !HasFinger(fingerIndex) ? Vector2.Zero : touch[fingerIndex].Position;
+        return !HasFinger() ? Vector2.Zero : touch[fingerIndex].Position;
     }
 
     public static float GetFingerX(int fingerIndex = 0)
@@ -41,41 +43,41 @@ public static class TouchManager
         return GetFingerPosition(fingerIndex).Y;
     }
 
-    public static bool WasReleased(PointerAction action, int fingerIndex = 0)
+    public static bool WasReleased(PointerAction action)
     {
-        if(!HasFinger(fingerIndex))
+        if(!HasFinger())
             return false;
         
         return action switch
         {
-            PointerAction.Primary => touch[fingerIndex].State == TouchLocationState.Released,
+            PointerAction.Primary => touch.First().State == TouchLocationState.Released && !stillHeldOver,
             PointerAction.Secondary => WasReleased(PointerAction.Primary) && stillHeldOver,
             _ => false
         };
     }
 
-    public static bool WasClicked(PointerAction action, int fingerIndex = 0)
+    public static bool WasClicked(PointerAction action)
     {
-        if(!HasFinger(fingerIndex))
+        if(!HasFinger())
             return false;
 
         return action switch
         {
-            PointerAction.Primary => touch[fingerIndex].State == TouchLocationState.Pressed,
-            PointerAction.Secondary => HeldOver(fingerIndex),
+            PointerAction.Primary => touch.First().State == TouchLocationState.Pressed,
+            PointerAction.Secondary => HeldOver(),
             _ => false
         };
     }
 
-    private static bool HeldOver(int fingerIndex = 0, int time = SECONDARY_CLICK_TIME)
+    private static bool HeldOver(int time = SECONDARY_CLICK_TIME)
     {
-        if (!HasFinger(fingerIndex))
+        if (!HasFinger())
         {
             stillHeldOver = false;
             return false;
         }
 
-        if (WasClicked(PointerAction.Primary, fingerIndex))
+        if (WasClicked(PointerAction.Primary))
         {
             stillHeldOver = false;
             holdTimer.Restart();
@@ -88,24 +90,24 @@ public static class TouchManager
         return true;
     }
     
-    private static bool HasFinger(TouchCollection panel, int fingerIndex = 0)
+    private static bool HasFinger(TouchCollection panel)
     {
-        return panel.Count >= fingerIndex + 1;
+        return panel.Count > 0;
     }
 
-    public static bool HasFinger(int fingerIndex = 0)
+    public static bool HasFinger()
     {
-        return HasFinger(touch, fingerIndex);
+        return HasFinger(touch);
     }
 
-    public static bool Inside(Rectangle bounds, int fingerIndex = 0)
+    public static bool Inside(Rectangle bounds)
     {
-        if(!HasFinger(fingerIndex))
+        if(!HasFinger())
             return false;
         
         Rectangle rect = new Rectangle(bounds.X, bounds.Y, bounds.Width, bounds.Height);
         
         return rect.Contains(
-            new Vector2(GetFingerX(fingerIndex), GetFingerY(fingerIndex)));
+            new Vector2(GetFingerX(), GetFingerY()));
     }
 }

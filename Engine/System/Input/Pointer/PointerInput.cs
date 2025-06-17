@@ -8,26 +8,24 @@ using Minesweeper.System.Input.Pointer.Remote;
 
 namespace Minesweeper.System.Input.Global;
 
-public class PointerInput
+public static class PointerInput
 {
-    private static readonly Dictionary<PointerAction, PointerSnapshot> pointerStates = new();
+    private static readonly PointerSnapshot[] pointerSnapshots = new PointerSnapshot[Enum.GetValues<PointerAction>().Length];
 
     public static void Update()
     {
-        pointerStates.Clear();
-
         foreach (PointerAction action in Enum.GetValues(typeof(PointerAction)))
         {
-            var mouseState = GetMouseSnapshot(action);
-            var touchState = GetTouchSnapshot(action);
+            var mouse = GetMouseSnapshot(action);
+            var touch = GetTouchSnapshot(action);
 
-            var chosen = mouseState.State switch
+            var chosen = mouse.State switch
             {
-                PointerState.Down or PointerState.Released => mouseState,
-                _ => touchState.State != PointerState.None ? touchState : mouseState
+                PointerState.Down or PointerState.Released => mouse,
+                _ => touch.State != PointerState.None ? touch : mouse
             };
 
-            pointerStates[action] = chosen;
+            pointerSnapshots[(int)action] = chosen;
         }
     }
 
@@ -54,42 +52,29 @@ public class PointerInput
 
         var pos = TouchManager.GetFingerPosition();
         var state = TouchManager.WasClicked(action) ? PointerState.Down :
-                    TouchManager.WasReleased(action) ? PointerState.Released :
-                    Inside(new Rectangle((int)pos.X, (int)pos.Y, 1, 1)) ?
-                        PointerState.Held : PointerState.None;
+            TouchManager.WasReleased(action) ? PointerState.Released :
+            Inside(new Rectangle((int)pos.X, (int)pos.Y, 1, 1)) ? PointerState.Held : PointerState.None;
 
         return new PointerSnapshot(pos, action, state);
     }
 
     public static bool WasClicked(PointerAction action) =>
-        pointerStates.TryGetValue(action, out var s) && s.State == PointerState.Down;
+        GetSnapshot(action).State == PointerState.Down;
 
     public static bool WasReleased(PointerAction action) =>
-        pointerStates.TryGetValue(action, out var s) && s.State == PointerState.Released;
+        GetSnapshot(action).State == PointerState.Released;
 
     public static bool IsHeld(PointerAction action) =>
-        pointerStates.TryGetValue(action, out var s) && s.State == PointerState.Held;
+        GetSnapshot(action).State == PointerState.Held;
 
     public static Vector2 GetPosition(PointerAction action) =>
-        pointerStates.TryGetValue(action, out var s) ? s.Position : Vector2.Zero;
+        GetSnapshot(action).Position;
 
     public static bool Inside(Rectangle bounds) =>
-        pointerStates.Values.Any(s => bounds.Contains(s.Position));
+        pointerSnapshots.Any(s => bounds.Contains(s.Position));
     
-    public static RemotePointerBatch GetCurrentInputBatch()
-    {
-        return new RemotePointerBatch
-        {
-            Events = Enum.GetValues(typeof(PointerAction))
-                .Cast<PointerAction>()
-                .Select(action => new RemotePointerEvent(
-                    action,
-                    GetPointerState(action),
-                    GetPosition(action)))
-                .Where(e => e.State != PointerState.None)
-                .ToList()
-        };
-    }
+    private static PointerSnapshot GetSnapshot(PointerAction action)
+        => pointerSnapshots[(int)action];
 
     public static PointerState GetPointerState(PointerAction action)
     {
@@ -99,13 +84,15 @@ public class PointerInput
         return PointerState.None;
     }
     
-    public static IInputSource GetInputSource(InputNode node)
+    public static PointerSnapshot[] GetPointerSnapshots() => pointerSnapshots;
+
+    public static IInputSource GetInputSource(InputSide side)
     {
-        return node switch
+        return side switch
         {
-            InputNode.Local => new LocalInputAdapter(),
-            InputNode.Remote => new RemoteInputAdapter(),
-            _ => throw new ArgumentOutOfRangeException(nameof(node))
+            InputSide.Local => new LocalInputAdapter(),
+            InputSide.Remote => new RemoteInputAdapter(),
+            _ => throw new ArgumentOutOfRangeException(nameof(side))
         };
     }
 }

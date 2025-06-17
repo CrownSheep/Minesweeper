@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Minesweeper.System.Input.Global;
+using Minesweeper.System.Input.Pointer.Remote;
 using Newtonsoft.Json;
 
 namespace Minesweeper;
@@ -14,32 +16,44 @@ public class TCPClient
     private StreamReader reader;
     private StreamWriter writer;
 
-    public TCPClient()
-    {
-        string ngrokAddress = "4.tcp.eu.ngrok.io:16631";
-        NgrokAddress address = new NgrokAddress(ngrokAddress);
+    private PointerSnapshot[] lastSnapshots;
 
+    public Action<PointerSnapshot[]>? OnInputReceived;
+
+    public TCPClient(string address)
+    {
         try
         {
-            client = new TcpClient(address.Host, address.Port);
+            NgrokAddress parsed = new NgrokAddress(address);
+            client = new TcpClient(parsed.Host, parsed.Port);
+
             stream = client.GetStream();
             reader = new StreamReader(stream);
             writer = new StreamWriter(stream) { AutoFlush = true };
-        
+
             Task.Run(ListenLoop);
         }
-        catch (Exception e)
+        catch
         {
-            Console.WriteLine("Server not running!");
+            Console.WriteLine("Failed to connect to server.");
         }
     }
 
-    public void SendClick(float x, float y, PointerAction action)
+    public async void SendInput(PointerSnapshot[] snapshots)
     {
-        // Click click = new Click(x, y, action);
-        // string json = JsonConvert.SerializeObject(click);
-        // writer.WriteLineAsync(json);
+        try
+        {
+            string json = JsonConvert.SerializeObject(snapshots);
+            Console.WriteLine(json);
+            await writer.WriteLineAsync(json);
+            lastSnapshots = snapshots;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Failed to send input to server.");
+        }
     }
+    
 
     private async Task ListenLoop()
     {
@@ -47,11 +61,15 @@ public class TCPClient
         {
             while (true)
             {
-                string readClick = await reader.ReadLineAsync();
-                if (string.IsNullOrEmpty(readClick)) break;
+                string? line = await reader.ReadLineAsync();
+                if (string.IsNullOrWhiteSpace(line)) break;
 
-                // Click click = JsonConvert.DeserializeObject<Click>(readClick);
-                // clientClick = click;
+                PointerSnapshot[]? snapshots = JsonConvert.DeserializeObject<PointerSnapshot[]>(line);
+                
+                if (snapshots == null) continue;
+                
+                RemoteInput.FromServer(snapshots);
+                OnInputReceived?.Invoke(snapshots);
             }
         }
         catch (Exception ex)

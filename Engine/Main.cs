@@ -18,13 +18,15 @@ public class Main : Game
         Zoomed
     }
 
+    private const string NGROK_ADDRESS = "7.tcp.eu.ngrok.io:18024";
+    
     private const string GAME_TITLE = "Minesweeper";
 
     private const string SPRITESHEET_ASSET_NAME = "minesweeper_spritesheet";
 
-    private const int DISPLAY_ZOOM_FACTOR = 3;
-    private const int DESKTOP_DEFAULT_ZOOM_FACTOR = 2;
-    private const int ANDROID_DEFAULT_ZOOM_FACTOR = 6;
+    public const int DISPLAY_ZOOM_FACTOR = 3;
+    public const int DESKTOP_DEFAULT_ZOOM_FACTOR = 2;
+    public const int MOBILE_DEFAULT_ZOOM_FACTOR = 6;
 
     public int WindowWidth => Config.width * GridTile.TILE_WIDTH + 20;
     public int WindowHeight => 56 + Config.height * GridTile.TILE_HEIGHT + 10;
@@ -33,12 +35,12 @@ public class Main : Game
     public static int Seed { get; private set;}
 
     private GraphicsDeviceManager graphics;
-    private SpriteBatch spriteBatch = null!;
+    private SpriteBatch spriteBatch;
 
-    private Texture2D spriteSheetTexture = null!;
-    private Texture2D transSpriteSheetTexture = null!;
+    private Texture2D spriteSheetTexture;
+    private Texture2D transSpriteSheetTexture;
     
-    private SpriteFont font = null!;
+    private SpriteFont font;
     
     public static TCPClient client;
     
@@ -51,16 +53,16 @@ public class Main : Game
             Matrix.CreateScale(
                 Environment == GameEnvironments.Desktop
                     ? DESKTOP_DEFAULT_ZOOM_FACTOR
-                    : ANDROID_DEFAULT_ZOOM_FACTOR - 0.06f,
+                    : MOBILE_DEFAULT_ZOOM_FACTOR - 0.06f,
                 Environment == GameEnvironments.Desktop
                     ? DESKTOP_DEFAULT_ZOOM_FACTOR
-                    : ANDROID_DEFAULT_ZOOM_FACTOR - 0.02f, 1);
+                    : MOBILE_DEFAULT_ZOOM_FACTOR - 0.02f, 1);
         set => transformMatrix = value;
     }
 
     private Matrix? transformMatrix;
 
-    private GameManager gameManager = null!;
+    private GameManager gameManager;
 
     private GameConfig DefaultConfig
     {
@@ -78,13 +80,13 @@ public class Main : Game
         }
     }
 
-    public GameConfig Config { get; private set; } = null!;
+    public GameConfig Config { get; private set; }
     public GameState GameState { get; set; }
-    public GameEnvironments Environment { get; set; }
-    public DisplayMode WindowDisplayMode { get; set; } = DisplayMode.Default;
+    public static GameEnvironments Environment { get; set; }
+    public static DisplayMode WindowDisplayMode { get; set; } = DisplayMode.Default;
 
     public int ZoomFactor => WindowDisplayMode == DisplayMode.Default
-        ? Environment == GameEnvironments.Desktop ? DESKTOP_DEFAULT_ZOOM_FACTOR : ANDROID_DEFAULT_ZOOM_FACTOR
+        ? Environment == GameEnvironments.Desktop ? DESKTOP_DEFAULT_ZOOM_FACTOR : MOBILE_DEFAULT_ZOOM_FACTOR
         : DISPLAY_ZOOM_FACTOR;
 
     public Main(GameEnvironments environment, IAndroidService? service = null)
@@ -101,7 +103,7 @@ public class Main : Game
     {
         base.Initialize();
         
-        client = new TCPClient();
+        client = new TCPClient(NGROK_ADDRESS);
         
         Window.Title = GAME_TITLE;
 

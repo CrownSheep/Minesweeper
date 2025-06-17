@@ -79,6 +79,8 @@ public sealed class GridTile(Main game, Vector2 position, int width, int height,
         if (state != PointerState.Released) return;
         
         if (game.GameState is GameState.Lose or GameState.Win) return;
+
+        SendToRemote();
         
         OnClickEvent(PointerAction.Primary);
     }
@@ -89,6 +91,8 @@ public sealed class GridTile(Main game, Vector2 position, int width, int height,
         if (state != PointerState.Down) return;
         
         if (game.GameState is GameState.Lose or GameState.Win) return;
+        
+        SendToRemote();
         
         OnClickEvent(PointerAction.Secondary);
     }

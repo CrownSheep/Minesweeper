@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Minesweeper.System.Input.Global;
+using Minesweeper.System.Input.Pointer.Remote;
 
 namespace Minesweeper.Entities;
 
@@ -27,9 +29,26 @@ public abstract class Clickable(Main game, Vector2 position, int width, int heig
         OnTertiaryAction(tertiaryPosition, PointerInput.GetPointerState(PointerAction.Tertiary));
     }
 
-    protected bool InBounds()
+    protected bool InBounds() => PointerInput.Inside(Bounds);
+
+    protected void SendToRemote()
     {
-        return PointerInput.Inside(Bounds);
+        PointerSnapshot[] scaledPointerSnapshots = PointerInput.GetPointerSnapshots();
+        for (int i = 0; i < scaledPointerSnapshots.Length; i++)
+        {
+            PointerSnapshot snapshot = scaledPointerSnapshots[i];
+            Vector2 position = snapshot.Position;
+            float scale = Main.Environment == GameEnvironments.Desktop
+                ? Main.WindowDisplayMode == Main.DisplayMode.Default
+                    ? Main.DESKTOP_DEFAULT_ZOOM_FACTOR
+                    : Main.DISPLAY_ZOOM_FACTOR
+                : Main.MOBILE_DEFAULT_ZOOM_FACTOR;
+            position /= scale;
+            PointerSnapshot scaledSnapshot = new PointerSnapshot(position, snapshot.Action, snapshot.State);
+            scaledPointerSnapshots[i] = scaledSnapshot;
+        }
+        
+        Main.client.SendInput(scaledPointerSnapshots);
     }
 
     protected virtual void OnPrimaryAction(Vector2 position, PointerState state)

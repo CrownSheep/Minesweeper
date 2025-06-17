@@ -4,5 +4,8 @@ using Server;
 
 const int PORT = 5000;
 
-TcpServer tcpServer = new TcpServer(PORT);
-tcpServer.Start();
+TcpServer server = new TcpServer(PORT);
+server.Start();
+Console.WriteLine("Press Enter to exit...");
+Console.ReadLine();
+server.Stop();

@@ -313,7 +313,7 @@ public sealed class GridManager
                     GridTile adjacentTile = Grid[adjacentX, adjacentY];
                     if (adjacentTile.IsHidden() && !adjacentTile.Flagged)
                     {
-                        if (game.Environment != GameEnvironments.Mobile)
+                        if (Main.Environment != GameEnvironments.Mobile)
                             ParticleManager.SpawnTileParticle(adjacentTile, false);
                         
                         if (!adjacentTile.IsBomb())
@@ -343,7 +343,7 @@ public sealed class GridManager
                     {
                         if (adjacentTile.IsEmpty() && adjacentTile.IsHidden() && !adjacentTile.Flagged)
                         {
-                            if (game.Environment != GameEnvironments.Mobile)
+                            if (Main.Environment != GameEnvironments.Mobile)
                                 ParticleManager.SpawnTileParticle(adjacentTile, false);
                             
                             adjacentTile.SetIndex(AdjacentBombCount(adjacentTile));

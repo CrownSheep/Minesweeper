@@ -1,6 +1,6 @@
 ﻿namespace Minesweeper.System.Input;
 
-public enum InputNode
+public enum InputSide
 {
     Local,
     Remote
