@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Minesweeper.Entities;
 using Minesweeper.System.Input.Global;
+using Minesweeper.System.Input.Pointer.Remote;
 
 namespace Minesweeper.DataHolders;
 
@@ -72,29 +73,32 @@ public sealed class GridTile(Main game, Vector2 position, int width, int height,
         base.Update(gameTime);
     }
 
-
-    protected override void OnPrimaryAction(Vector2 position, PointerState state)
+    protected override void OnPrimaryAction(Vector2 localPosition, PointerState localState,
+        Vector2 remotePosition, PointerState remoteState)
     {
-        if (!InBounds()) return;
-        if (state != PointerState.Released) return;
-        
         if (game.GameState is GameState.Lose or GameState.Win) return;
-
-        SendToRemote();
+        
+        if (!InBounds() && !RemoteInput.Inside(Bounds)) return;
+        
+        if (localState != PointerState.Released && remoteState != PointerState.Released) return;
         
         OnClickEvent(PointerAction.Primary);
+        
+        SendInputToRemote();
     }
     
-    protected override void OnSecondaryAction(Vector2 position, PointerState state)
+    protected override void OnSecondaryAction(Vector2 localPosition, PointerState localState,
+        Vector2 remotePosition, PointerState remoteState)
     {
-        if (!InBounds()) return;
-        if (state != PointerState.Down) return;
-        
         if (game.GameState is GameState.Lose or GameState.Win) return;
+
+        if (!InBounds() && !RemoteInput.Inside(Bounds)) return;
         
-        SendToRemote();
+        if (localState != PointerState.Down && remoteState != PointerState.Down) return;
         
         OnClickEvent(PointerAction.Secondary);
+        
+        SendInputToRemote();
     }
     
     public void Flag()

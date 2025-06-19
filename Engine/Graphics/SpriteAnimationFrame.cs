@@ -1,23 +1,22 @@
 ﻿using System;
 
-namespace Minesweeper.Graphics
+namespace Minesweeper.Graphics;
+
+public class SpriteAnimationFrame
 {
-    public class SpriteAnimationFrame
+    private Sprite sprite;
+
+    public Sprite Sprite
     {
-        private Sprite sprite;
+        get => sprite;
+        set => sprite = value ?? throw new ArgumentNullException(nameof(value), "The sprite cannot be null");
+    }
 
-        public Sprite Sprite
-        {
-            get => sprite;
-            set => sprite = value ?? throw new ArgumentNullException(nameof(value), "The sprite cannot be null");
-        }
+    public float TimeStamp { get; }
 
-        public float TimeStamp { get; }
-
-        public SpriteAnimationFrame(Sprite sprite, float timeStamp)
-        {
-            Sprite = sprite;
-            TimeStamp = timeStamp;
-        }
+    public SpriteAnimationFrame(Sprite sprite, float timeStamp)
+    {
+        Sprite = sprite;
+        TimeStamp = timeStamp;
     }
 }

@@ -1,10 +1,9 @@
-﻿namespace Minesweeper
+﻿namespace Minesweeper;
+
+public enum GameState
 {
-    public enum GameState
-    {
-        Playing,
-        Held,
-        Lose,
-        Win
-    }
+    Playing,
+    Held,
+    Lose,
+    Win
 }

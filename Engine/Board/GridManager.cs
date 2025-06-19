@@ -31,7 +31,12 @@ public sealed class GridManager
     private Main game;
 
     public GameConfig Config { get; private set; }
+    
     private Vector2 Position { get; }
+    
+    public Random Random { get; private set; }
+    
+    public int Seed { get; set;}
 
     public GridManager(Main game, Vector2 position)
     {
@@ -47,7 +52,7 @@ public sealed class GridManager
             GridTile[] aboveZ = Grid.Cast<GridTile>().Where(tile => tile.Index > 0).ToArray();
             if (aboveZ.Length > 0)
             {
-                GridTile tile = aboveZ[Main.Random.Next(0, aboveZ.Length)];
+                GridTile tile = aboveZ[Random.Next(0, aboveZ.Length)];
                 ParticleManager.SpawnTileParticle(tile, true);
                 tile.Index = GridTile.EMPTY_INDEX;
             }
@@ -56,6 +61,13 @@ public sealed class GridManager
 
     public void Initialize(GameConfig config)
     {
+        Seed = Egg.HasSeed() ? Egg.GetSeed() : Environment.TickCount;
+        
+        if(!Egg.HasSeed())
+            Main.client.SendMessage(MessageType.BoardSeed, Seed);
+
+        Random = new Random(Seed);
+        
         Config = config;
         Grid = new GridTile[Config.width, Config.height];
         // X
@@ -97,8 +109,8 @@ public sealed class GridManager
         int bombsPlaced = 0;
         while (bombsPlaced < Math.Clamp(bombCount, 0, tileCount - 1))
         {
-            int randX = Main.Random.Next(Config.width);
-            int randY = Main.Random.Next(Config.height);
+            int randX = Random.Next(Config.width);
+            int randY = Random.Next(Config.height);
             GridTile randTile = Grid[randX, randY];
 
             if (!randTile.IsBomb() &&
@@ -154,7 +166,7 @@ public sealed class GridManager
     public void Win()
     {
         GridTile[] nonBombTiles = Grid.Cast<GridTile>().Where(tile => !tile.IsBomb()).ToArray();
-        OnClickTile(nonBombTiles[Main.Random.Next(nonBombTiles.Length)], new OnClickEventArgs(PointerAction.Primary));
+        OnClickTile(nonBombTiles[Random.Next(nonBombTiles.Length)], new OnClickEventArgs(PointerAction.Primary));
         foreach (GridTile tile in Grid)
         {
             if (tile.IsEmpty())

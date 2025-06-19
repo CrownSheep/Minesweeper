@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Minesweeper.DataHolders;
 using Minesweeper.System.Input.Global;
 using Minesweeper.System.Input.Pointer.Remote;
 using Newtonsoft.Json;
@@ -16,16 +17,17 @@ public class TCPClient
     private StreamReader reader;
     private StreamWriter writer;
 
-    private PointerSnapshot[] lastSnapshots;
+    public TcpClient Client => client;
+    public NgrokAddress Address { get; private set; }
 
-    public Action<PointerSnapshot[]>? OnInputReceived;
+    // public Action<PointerSnapshot[]>? OnInputReceived;
 
     public TCPClient(string address)
     {
         try
         {
-            NgrokAddress parsed = new NgrokAddress(address);
-            client = new TcpClient(parsed.Host, parsed.Port);
+            Address = new NgrokAddress(address);
+            client = new TcpClient(Address.Host, Address.Port);
 
             stream = client.GetStream();
             reader = new StreamReader(stream);
@@ -33,27 +35,44 @@ public class TCPClient
 
             Task.Run(ListenLoop);
         }
-        catch
+        catch (Exception ex)
         {
-            Console.WriteLine("Failed to connect to server.");
+            Console.WriteLine($"Failed to connect to server: {ex}");
         }
     }
 
-    public async void SendInput(PointerSnapshot[] snapshots)
+    // public async void SendInput(PointerSnapshot[] snapshots)
+    // {
+    //     try
+    //     {
+    //         string json = JsonConvert.SerializeObject(snapshots);
+    //         await writer.WriteLineAsync(json);
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         Console.WriteLine($"Failed to send input to server: {e}"); 
+    //     }
+    // }
+
+    public async void SendMessage<T>(MessageType type, T payload)
     {
         try
         {
-            string json = JsonConvert.SerializeObject(snapshots);
-            Console.WriteLine(json);
+            var message = new NetworkMessage
+            {
+                Type = type,
+                PayloadJson = JsonConvert.SerializeObject(payload)
+            };
+
+            string json = JsonConvert.SerializeObject(message);
             await writer.WriteLineAsync(json);
-            lastSnapshots = snapshots;
         }
         catch (Exception e)
         {
-            Console.WriteLine("Failed to send input to server.");
+            // ignored
         }
     }
-    
+
 
     private async Task ListenLoop()
     {
@@ -61,15 +80,32 @@ public class TCPClient
         {
             while (true)
             {
-                string? line = await reader.ReadLineAsync();
-                if (string.IsNullOrWhiteSpace(line)) break;
+                string? json = await reader.ReadLineAsync();
+                if (string.IsNullOrWhiteSpace(json)) break;
 
-                PointerSnapshot[]? snapshots = JsonConvert.DeserializeObject<PointerSnapshot[]>(line);
-                
-                if (snapshots == null) continue;
-                
-                RemoteInput.FromServer(snapshots);
-                OnInputReceived?.Invoke(snapshots);
+                NetworkMessage? message = JsonConvert.DeserializeObject<NetworkMessage>(json);
+
+                switch (message?.Type)
+                {
+                    case MessageType.BoardSeed:
+                    {
+                        int seed = JsonConvert.DeserializeObject<int>(message.PayloadJson);
+                        Egg.SetSeed(seed);
+                        
+                        break;
+                    }
+                    case MessageType.PointerInput:
+                    {
+                        PointerSnapshot[]? snapshots =
+                            JsonConvert.DeserializeObject<PointerSnapshot[]>(message.PayloadJson);
+
+                        if (snapshots == null) continue;
+
+                        RemoteInput.UpdateSnapshots(snapshots);
+                        
+                        break;
+                    }
+                }
             }
         }
         catch (Exception ex)

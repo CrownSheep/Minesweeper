@@ -4,31 +4,30 @@ using Android.OS;
 using Android.Views;
 using Microsoft.Xna.Framework;
 
-namespace Minesweeper.Android
+namespace Minesweeper.Android;
+
+[Activity(
+    Label = "@string/app_name",
+    MainLauncher = true,
+    Icon = "@drawable/icon",
+    AlwaysRetainTaskState = true,
+    LaunchMode = LaunchMode.SingleInstance,
+    ScreenOrientation = ScreenOrientation.UserPortrait,
+    ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Keyboard | ConfigChanges.KeyboardHidden |
+                           ConfigChanges.ScreenSize
+)]
+public class Activity1 : AndroidGameActivity
 {
-    [Activity(
-        Label = "@string/app_name",
-        MainLauncher = true,
-        Icon = "@drawable/icon",
-        AlwaysRetainTaskState = true,
-        LaunchMode = LaunchMode.SingleInstance,
-        ScreenOrientation = ScreenOrientation.UserPortrait,
-        ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.Keyboard | ConfigChanges.KeyboardHidden |
-                               ConfigChanges.ScreenSize
-    )]
-    public class Activity1 : AndroidGameActivity
+    private Main game;
+    private View view;
+
+    protected override void OnCreate(Bundle bundle)
     {
-        private Main game;
-        private View view;
+        base.OnCreate(bundle);
+        game = new Main(GameEnvironments.Mobile, new AndroidService());
+        view = game.Services.GetService(typeof(View)) as View;
 
-        protected override void OnCreate(Bundle bundle)
-        {
-            base.OnCreate(bundle);
-            game = new Main(GameEnvironments.Mobile, new AndroidService());
-            view = game.Services.GetService(typeof(View)) as View;
-
-            SetContentView(view);
-            game.Run();
-        }
+        SetContentView(view);
+        game.Run();
     }
 }

@@ -29,7 +29,7 @@ public class TcpServer(int port)
                 TcpClient client = await listener.AcceptTcpClientAsync();
                 var wrapper = new ClientWrapper(client);
                 lock (allClients) allClients.Add(wrapper);
-                Console.WriteLine("Client connected");
+                Console.WriteLine($"Client connected: {client.Client.RemoteEndPoint}");
 
                 _ = HandleClientAsync(wrapper);
             }
@@ -47,18 +47,20 @@ public class TcpServer(int port)
         
         try
         {
-            while (client.Connected)
+            while (true)
             {
                 string? line = await reader.ReadLineAsync();
                 if (line == null) break;
                 
+                Console.WriteLine(line);
+                
+                // Send to other clients
                 lock (allClients)
                 {
                     foreach (var other in allClients.Where(c => c != wrapper).ToList())
                     {
                         try
                         {
-                            Console.WriteLine(line);
                             other.Writer.WriteLine(line);
                         }
                         catch
@@ -76,6 +78,7 @@ public class TcpServer(int port)
         }
         finally
         {
+            Console.WriteLine($"Client disconnected: {client.Client.RemoteEndPoint}");
             client.Close();
             lock (allClients) allClients.Remove(wrapper);
         }

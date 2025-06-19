@@ -18,7 +18,7 @@ public class Main : Game
         Zoomed
     }
 
-    private const string NGROK_ADDRESS = "7.tcp.eu.ngrok.io:18024";
+    private const string NGROK_ADDRESS = "4.tcp.eu.ngrok.io:10429";
     
     private const string GAME_TITLE = "Minesweeper";
 
@@ -30,9 +30,6 @@ public class Main : Game
 
     public int WindowWidth => Config.width * GridTile.TILE_WIDTH + 20;
     public int WindowHeight => 56 + Config.height * GridTile.TILE_HEIGHT + 10;
-    
-    public static Random Random { get; private set; }
-    public static int Seed { get; private set;}
 
     private GraphicsDeviceManager graphics;
     private SpriteBatch spriteBatch;
@@ -62,7 +59,7 @@ public class Main : Game
 
     private Matrix? transformMatrix;
 
-    private GameManager gameManager;
+    public GameManager gameManager;
 
     private GameConfig DefaultConfig
     {
@@ -85,7 +82,7 @@ public class Main : Game
     public static GameEnvironments Environment { get; set; }
     public static DisplayMode WindowDisplayMode { get; set; } = DisplayMode.Default;
 
-    public int ZoomFactor => WindowDisplayMode == DisplayMode.Default
+    public static int ZoomFactor => WindowDisplayMode == DisplayMode.Default
         ? Environment == GameEnvironments.Desktop ? DESKTOP_DEFAULT_ZOOM_FACTOR : MOBILE_DEFAULT_ZOOM_FACTOR
         : DISPLAY_ZOOM_FACTOR;
 
@@ -101,9 +98,9 @@ public class Main : Game
 
     protected override void Initialize()
     {
-        base.Initialize();
-        
         client = new TCPClient(NGROK_ADDRESS);
+        
+        base.Initialize();
         
         Window.Title = GAME_TITLE;
 
@@ -114,9 +111,6 @@ public class Main : Game
         graphics.ApplyChanges();
 
         Globals.Content = Content;
-        
-        Seed = global::System.Environment.TickCount;
-        Random = new Random(Seed);
     }
 
 
@@ -140,6 +134,9 @@ public class Main : Game
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
+        if(client.Client is { Connected: false })
+            client = new TCPClient(NGROK_ADDRESS);
+        
         Globals.Update(gameTime);
         ParticleManager.Update(gameTime);
         

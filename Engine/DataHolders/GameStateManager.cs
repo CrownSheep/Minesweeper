@@ -5,6 +5,7 @@ using Minesweeper.Entities;
 using Minesweeper.Graphics;
 using Minesweeper.Particles;
 using Minesweeper.System.Input.Global;
+using Minesweeper.System.Input.Pointer.Remote;
 
 namespace Minesweeper.DataHolders;
 
@@ -14,20 +15,22 @@ public class GameStateManager(Main game, Vector2 position, int width, int height
     public const int SPRITE_WIDTH = 24;
     public const int SPRITE_HEIGHT = 24;
 
-    protected override void OnPrimaryAction(Vector2 position, PointerState state)
+    protected override void OnPrimaryAction(Vector2 localPosition, PointerState localState,
+        Vector2 remotePosition, PointerState remoteState)
     {
-        if (!InBounds()) return;
-        if (state != PointerState.Released) return;
-
-        SendToRemote();
+        if (!InBounds() && !RemoteInput.Inside(Bounds)) return;
+        
+        if (localState != PointerState.Released && remoteState != PointerState.Released) return;
         
         game.LoadGameWithConfig(game.Config);
         game.GameState = GameState.Playing;
         restartAction.Invoke();
         ParticleManager.SpawnInCircle(new PhysicsParticle()
         {
-            Sprite = new Sprite(Globals.TransparentSpriteSheet, 4, 27, 17, 17),
+            Sprite = Sprites.Smile
         }, new Vector2(Position.X + Width / 2, Position.Y + Height / 2), 0);
+        
+        SendInputToRemote();
     }
 
     public GameStateSprite GetSpriteByGameState(GameState state)

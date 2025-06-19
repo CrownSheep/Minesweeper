@@ -11,6 +11,15 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
     <ItemGroup>
+      <None Remove="Content\minesweeper_spritesheet.png" />
+      <None Remove="Content\transparent_minesweeper_spritesheet.png" />
+    </ItemGroup>
+    <ItemGroup>
+      <AndroidAsset Include="Content\font.spritefont" />
+      <AndroidAsset Include="Content\minesweeper_spritesheet.png" />
+      <AndroidAsset Include="Content\transparent_minesweeper_spritesheet.png" />
+    </ItemGroup>
+    <ItemGroup>
         <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.4" />
         <PackageReference Include="MonoGame.Framework.Android" Version="3.8.2.1105" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
@@ -24,8 +33,11 @@
       </EmbeddedResource>
     </ItemGroup>
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
-        <Message Text="Restoring dotnet tools" Importance="High"/>
-        <Exec Command="dotnet tool restore"/>
+        <Message Text="Restoring dotnet tools" Importance="High" />
+        <Exec Command="dotnet tool restore" />
     </Target>
     <Import Project="..\Engine\Engine.projitems" Label="Shared" />
+    <ItemGroup>
+      <None Remove="Content\font.spritefont" />
+    </ItemGroup>
 </Project>
